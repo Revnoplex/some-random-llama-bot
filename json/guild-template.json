@@ -1,0 +1,15 @@
+{
+  "name" : "Server name should automatically be filled out",
+  "server id" : 0,
+  "log channel" : null,
+  "welcome channel" : null,
+  "spam channel": null,
+  "join leave" : {
+    "welcome message" :  "G'day {user_mention}!\nYou are member **#{server_member_count}** of **{server_name}**",
+    "leave message" : "**{username}** ate too many Bunnings snags and left"
+  },
+  "member role" : null,
+  "mute role" : null,
+  "auto admin role" : null,
+  "raid protection mode" : null
+}

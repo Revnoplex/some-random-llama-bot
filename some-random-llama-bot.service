@@ -1,0 +1,16 @@
+[Unit]
+Description=Systemd service for running SomeRandomLlamaBot on the server with LLama
+After=network.target
+
+[Service]
+ExecStart=/home/server-admin/bots/SomeRandomLlamaBot/main.py --systemd
+WorkingDirectory=/home/server-admin/bots/SomeRandomLlamaBot
+StandardOutput=inherit
+StandardError=inherit
+Restart=on-failure
+User=server-admin
+Type=notify-reload
+
+[Install]
+WantedBy=multi-user.target
+

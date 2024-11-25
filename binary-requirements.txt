@@ -1,0 +1,7 @@
+ffmpeg
+apcupsd
+whois
+bash
+dash
+csh
+zsh
