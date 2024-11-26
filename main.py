@@ -32,22 +32,6 @@ def stop(signum, _):
     sys.exit('The bot has exited as requested from systemd')
 
 
-# ascii art colour depends on version code of bot (see config.py)
-ascii_colour = config.ascii_colour
-# noinspection SpellCheckingInspection
-ascii_startup = [f"\033[1m   _______________________________________",
-                 f"  /                                       \\",
-                 f" /       ############                      \\",
-                 f"|        #    @ @ @ #                       |       Built on Revnobot v2.8",
-                 f"|        #   @ @ @  #                       |",
-                 f"|  ############ @   #               {ascii_colour}@@@\033[0;1m     |",
-                 f"|  #    @ @ @ #@    #              {ascii_colour}@@@@@\033[0;1m    |       {config.copyright_line}",
-                 f"|  #   @ @ @  #######               {ascii_colour}@@@\033[0;1m     |",
-                 f"|  #  @ @ @   #                             |",
-                 f"|  # @ @ @    #                             |       starting up....",
-                 f" \\ ############                            /",
-                 f"  \\_______________________________________/\033[0m"]
-
 if __name__ == "__main__":
     # Add signal handlers if running as systemd service
     if config.systemd_service:
@@ -55,7 +39,7 @@ if __name__ == "__main__":
         signal.signal(signal.SIGHUP, reload)
         for sig in [signal.SIGINT, signal.SIGTERM]:
             signal.signal(sig, stop)
-    # print ascii art
+    # print startup text
     print(f"SomeRandomLlamaBot {config.version}")
     print(config.copyright_line)
     print("starting up....")
