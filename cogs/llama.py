@@ -35,7 +35,7 @@ class Llama(config.RevnobotCog):
         await ctx.defer()
         try:
             self.ollama_client.ps()
-        except httpx.ConnectError:
+        except (httpx.ConnectError, httpx.TimeoutException):
             app = await ctx.bot.application_info()
             await ctx.respond(embed=utils.default_embed(
                 ctx, "Cannot Connect to Ollama Server.",
@@ -43,13 +43,22 @@ class Llama(config.RevnobotCog):
                 f"Please ask {app.owner.mention} to start the ollama server."
             ))
             return
+        except httpx.HTTPError as error:
+            await ctx.respond(embed=utils.default_embed(
+                ctx, "Error Connecting to Ollama Server.",
+                f"There was a problem trying to connect to the ollama server: {error}"
+            ))
+            return
         available_models = [model.model for model in self.ollama_client.list().models]
         if prompt.split()[0] in available_models:
             model = prompt.split()[0]
         if model not in available_models:
+            app_cmd = ctx.bot.get_application_command('list-models')
+            app_cmd_name = f"</{app_cmd.qualified_name}:{app_cmd.qualified_id}>" if app_cmd else "/list-models"
             await ctx.respond(embed=utils.default_embed(
                 ctx, "Model Not Found",
-                f"The model {model} is not available. See {ctx.bot.get_command('list-models').id} for available models."
+                f"The model ``{model}`` is not available. "
+                f"See **{ctx.bot.command_prefix}list-models** or {app_cmd_name} for available models."
             ))
             return
         response = await ctx.bot.loop.run_in_executor(None, lambda: self.ollama_client.chat(model=model, messages=[
@@ -65,14 +74,13 @@ class Llama(config.RevnobotCog):
                 embed=utils.default_embed(ctx, "Llama Response", f"{response.message.content}")
             )
         else:
-            print(response.message.content)
             await ctx.respond(
                 embed=utils.default_embed(
                     ctx, "Response Too large",
-                    f"Llama sent a response longer that the maximum amount of characters allowed on discord (4096)"
+                    f"Llama sent a response longer that the maximum amount of characters allowed on discord (4096). "
+                    f"Please tell llama to limit the response to 4096 characters."
                 )
             )
-            await ctx.respond(f"Response too large")
 
     # noinspection SpellCheckingInspection,PyTypeHints
     @bridge.bridge_command(
@@ -84,7 +92,7 @@ class Llama(config.RevnobotCog):
     async def list_models_cmd(self, ctx: bridge.Context,):
         try:
             self.ollama_client.ps()
-        except httpx.ConnectError:
+        except (httpx.ConnectError, httpx.TimeoutException):
             app = await ctx.bot.application_info()
             await ctx.respond(embed=utils.default_embed(
                 ctx, "Cannot Connect to Ollama Server.",
@@ -92,7 +100,24 @@ class Llama(config.RevnobotCog):
                 f"Please ask {app.owner.mention} to start the ollama server."
             ))
             return
-        await ctx.respond("\n".join([model.model for model in self.ollama_client.list().models]))
+        except httpx.HTTPError as error:
+            await ctx.respond(embed=utils.default_embed(
+                ctx, "Error Connecting to Ollama Server.",
+                f"There was a problem trying to connect to the ollama server: {error}"
+            ))
+            return
+        embed = utils.default_embed(
+            ctx, "Available Models", ""
+        )
+        for model in self.ollama_client.list().models:
+            if len(embed.fields) >= 25:
+                break
+            embed.add_field(
+                name=f"{model.model}",
+                value=f"Parameter Size: `{model.details.parameter_size}`"
+                      f"\nQuantization: `{model.details.quantization_level}`"
+            )
+        await ctx.respond(embed=embed)
 
 
 def setup(client):
