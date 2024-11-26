@@ -27,7 +27,7 @@ class Llama(config.RevnobotCog):
     async def ask_llama_cmd(
             self, ctx: bridge.Context, *, prompt: BridgeOption(str, "Prompt to send to llama"),
             model: BridgeOption(
-                str, "The llama model to use. See /ollama-list for available models",
+                str, "The llama model to use. See /list-models for available models",
                 default="llama3.2:latest"
             ) = "llama3.2"
     ):
@@ -106,8 +106,12 @@ class Llama(config.RevnobotCog):
                 f"There was a problem trying to connect to the ollama server: {error}"
             ))
             return
+        app_cmd = ctx.bot.get_application_command('ask-llama')
+        app_cmd_name = f"</{app_cmd.qualified_name}:{app_cmd.qualified_id}>" if app_cmd else "/ask-llama"
         embed = utils.default_embed(
-            ctx, "Available Models", ""
+            ctx, "Available Models",
+            f"List of available llama models that can be used with "
+            f"**{ctx.bot.command_prefix}ask-llama** or {app_cmd_name}"
         )
         for model in self.ollama_client.list().models:
             if len(embed.fields) >= 25:
