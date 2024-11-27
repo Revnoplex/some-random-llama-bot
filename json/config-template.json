@@ -8,5 +8,6 @@
   "slash guilds": [],
   "log messages": false,
   "revnobux_db_path": "../global-json/revnobux/revnobux.json",
-  "logging excluded": []
+  "logging excluded": [],
+  "ollama_server": "http://127.0.0.1:11434"
 }

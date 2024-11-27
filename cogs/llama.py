@@ -16,9 +16,7 @@ class Llama(config.RevnobotCog):
         self.description = "Commands to interact with the llama llm"
         self.icon = "\U0001f999"
         self.hidden = False
-        self.ollama_client = ollama.AsyncClient(
-            host='http://192.168.100.41:11434',
-        )
+        self.ollama_client = ollama.AsyncClient(config.ollama_server)
 
     # noinspection SpellCheckingInspection,PyTypeHints
     @bridge.bridge_command(

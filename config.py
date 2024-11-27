@@ -69,6 +69,7 @@ user_badge_emojis = emoji_db["user badges"]
 debug_mode: bool = sysinfo["debug mode"]
 log_messages: bool = sysinfo["log messages"]
 logging_excluded: list = sysinfo["logging excluded"]
+ollama_server: str = sysinfo["ollama_server"]
 ascii_colour = "\033[0m"
 version_int = 0
 if version_code == "alpha":
