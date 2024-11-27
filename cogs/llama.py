@@ -1,7 +1,6 @@
 import discord
 import httpx
 import ollama
-from ollama import Client
 from discord.ext import commands, bridge
 from discord.ext.bridge import BridgeOption
 import config
@@ -15,7 +14,7 @@ class Llama(config.RevnobotCog):
         self.description = "Commands to interact with the llama llm"
         self.icon = "\U0001f999"
         self.hidden = False
-        self.ollama_client = Client(
+        self.ollama_client = ollama.AsyncClient(
             host='http://192.168.100.41:11434',
         )
 
@@ -36,7 +35,7 @@ class Llama(config.RevnobotCog):
         """About the bot?"""
         await ctx.defer()
         try:
-            self.ollama_client.ps()
+            await self.ollama_client.ps()
         except (httpx.ConnectError, httpx.TimeoutException):
             app = await ctx.bot.application_info()
             await ctx.respond(embed=utils.default_embed(
@@ -51,7 +50,7 @@ class Llama(config.RevnobotCog):
                 f"There was a problem trying to connect to the ollama server: {error}"
             ))
             return
-        available_models = [model.model for model in self.ollama_client.list().models]
+        available_models = [model.model for model in (await self.ollama_client.list()).models]
         if prompt.split()[0].upper() in ['1B', '3B']:
             model = prompt.split()[0].upper()
         model_id = {"1B": "llama3.2:1b-instruct-fp16", "3B": "llama3.2:3b-instruct-fp16"}[model]
@@ -62,14 +61,14 @@ class Llama(config.RevnobotCog):
             ))
             return
         try:
-            response = await ctx.bot.loop.run_in_executor(None, lambda: self.ollama_client.chat(
+            response = await self.ollama_client.chat(
                 model=model_id, messages=[
                     {
                         'role': 'user',
                         'content': prompt,
                     },
                 ]
-            ))
+            )
         except ollama.ResponseError as error:
             await ctx.respond(embed=utils.default_embed(
                 ctx, "Error Genrating Response",
@@ -118,7 +117,7 @@ class Llama(config.RevnobotCog):
             ).read()
             images.append(image_bytes)
         try:
-            self.ollama_client.ps()
+            await self.ollama_client.ps()
         except (httpx.ConnectError, httpx.TimeoutException):
             app = await ctx.bot.application_info()
             await ctx.respond(embed=utils.default_embed(
@@ -133,7 +132,7 @@ class Llama(config.RevnobotCog):
                 f"There was a problem trying to connect to the ollama server: {error}"
             ))
             return
-        available_models = [model.model for model in self.ollama_client.list().models]
+        available_models = [model.model for model in (await self.ollama_client.list()).models]
 
         if prompt.split()[0].upper() in ['11B', '90B']:
             model = prompt.split()[0].upper()
@@ -145,7 +144,7 @@ class Llama(config.RevnobotCog):
             ))
             return
         try:
-            response = await ctx.bot.loop.run_in_executor(None, lambda: self.ollama_client.chat(
+            response = await self.ollama_client.chat(
                 model=model_id, messages=[
                     {
                         'role': 'user',
@@ -153,7 +152,7 @@ class Llama(config.RevnobotCog):
                         'images': images
                     },
                 ]
-            ))
+            )
         except ollama.ResponseError as error:
             await ctx.respond(embed=utils.default_embed(
                 ctx, "Error Genrating Response",
@@ -192,7 +191,7 @@ class Llama(config.RevnobotCog):
         """About the bot?"""
         await ctx.defer()
         try:
-            self.ollama_client.ps()
+            await self.ollama_client.ps()
         except (httpx.ConnectError, httpx.TimeoutException):
             app = await ctx.bot.application_info()
             await ctx.respond(embed=utils.default_embed(
@@ -207,7 +206,7 @@ class Llama(config.RevnobotCog):
                 f"There was a problem trying to connect to the ollama server: {error}"
             ))
             return
-        available_models = [model.model for model in self.ollama_client.list().models]
+        available_models = [model.model for model in (await self.ollama_client.list()).models]
         if prompt.split()[0].upper() in ['1B', '3B']:
             model = prompt.split()[0].upper()
         model_id = {"1B": "llama3.2:1b-text-fp16", "3B": "llama3.2:3b-text-fp16"}[model]
@@ -218,14 +217,14 @@ class Llama(config.RevnobotCog):
             ))
             return
         try:
-            response = await ctx.bot.loop.run_in_executor(None, lambda: self.ollama_client.chat(
+            response = await self.ollama_client.chat(
                 model=model_id, messages=[
                     {
                         'role': 'user',
                         'content': prompt,
                     },
                 ]
-            ))
+            )
         except ollama.ResponseError as error:
             await ctx.respond(embed=utils.default_embed(
                 ctx, "Error Genrating Response",
