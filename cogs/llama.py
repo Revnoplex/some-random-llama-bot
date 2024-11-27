@@ -1,3 +1,5 @@
+from contextlib import nullcontext
+
 import discord
 import httpx
 import ollama
@@ -61,14 +63,15 @@ class Llama(config.RevnobotCog):
             ))
             return
         try:
-            response = await self.ollama_client.chat(
-                model=model_id, messages=[
-                    {
-                        'role': 'user',
-                        'content': prompt,
-                    },
-                ]
-            )
+            async with ctx.typing() if not isinstance(ctx, discord.ApplicationContext) else nullcontext():
+                response = await self.ollama_client.chat(
+                    model=model_id, messages=[
+                        {
+                            'role': 'user',
+                            'content': prompt,
+                        },
+                    ]
+                )
         except ollama.ResponseError as error:
             await ctx.respond(embed=utils.default_embed(
                 ctx, "Error Genrating Response",
@@ -144,15 +147,16 @@ class Llama(config.RevnobotCog):
             ))
             return
         try:
-            response = await self.ollama_client.chat(
-                model=model_id, messages=[
-                    {
-                        'role': 'user',
-                        'content': prompt,
-                        'images': images
-                    },
-                ]
-            )
+            async with ctx.typing() if not isinstance(ctx, discord.ApplicationContext) else nullcontext():
+                response = await self.ollama_client.chat(
+                    model=model_id, messages=[
+                        {
+                            'role': 'user',
+                            'content': prompt,
+                            'images': images
+                        },
+                    ]
+                )
         except ollama.ResponseError as error:
             await ctx.respond(embed=utils.default_embed(
                 ctx, "Error Genrating Response",
@@ -217,14 +221,15 @@ class Llama(config.RevnobotCog):
             ))
             return
         try:
-            response = await self.ollama_client.chat(
-                model=model_id, messages=[
-                    {
-                        'role': 'user',
-                        'content': prompt,
-                    },
-                ]
-            )
+            async with ctx.typing() if not isinstance(ctx, discord.ApplicationContext) else nullcontext():
+                response = await self.ollama_client.chat(
+                    model=model_id, messages=[
+                        {
+                            'role': 'user',
+                            'content': prompt,
+                        },
+                    ]
+                )
         except ollama.ResponseError as error:
             await ctx.respond(embed=utils.default_embed(
                 ctx, "Error Genrating Response",

@@ -46,7 +46,7 @@ if __name__ == "__main__":
 
 # specify the client and intents
 # noinspection SpellCheckingInspection
-intents = discord.Intents.default()
+intents = discord.Intents.default() + discord.Intents.message_content
 client: bridge.Bot = bridge.Bot(command_prefix=config.prefix, intents=intents,
                                 help_command=information.RevnobotHelp3(), debug_guilds=config.slash_guilds,
                                 max_messages=10**3, enable_debug_events=config.debug_mode)
