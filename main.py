@@ -50,10 +50,6 @@ intents = discord.Intents.default() + discord.Intents.message_content
 client: bridge.Bot = bridge.Bot(command_prefix=config.prefix, intents=intents,
                                 help_command=information.RevnobotHelp3(), debug_guilds=config.slash_guilds,
                                 max_messages=10**3, enable_debug_events=config.debug_mode)
-# noinspection SpellCheckingInspection
-client.u_stoopid_counter = 0
-client.stay_in = []
-client.active_voice_text_channels = {}
 # setup logging for the pycord library
 logger = logging.getLogger('discord')
 logger.setLevel(logging.INFO)
