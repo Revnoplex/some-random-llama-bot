@@ -4,10 +4,9 @@
   "default_cooldown_rate": 1,
   "default_cooldown_time": 5.0,
   "debug mode": false,
-  "copyright line": "Copyright © Revnoplex 2019-{copyright_year}",
+  "copyright line": "Copyright © Revnoplex {copyright_year}",
   "slash guilds": [],
   "log messages": false,
-  "revnobux_db_path": "../global-json/revnobux/revnobux.json",
   "logging excluded": [],
   "ollama_server": "http://127.0.0.1:11434"
 }
