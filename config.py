@@ -14,7 +14,7 @@ for key in sysinfo_check.keys():
         print("New config field not present in old config.json!\n"
               "Attempting to fix the issue by copying the field from the template...")
         sysinfo[key] = sysinfo_check[key]
-        with open('./json/config.json') as w_sysinfo:
+        with open('./json/config.json', "w") as w_sysinfo:
             json.dump(sysinfo, w_sysinfo, ensure_ascii=False, intent=2)
 with open('./json/version-info.json') as version_info_handle:
     raw_version_info: dict = json.load(version_info_handle)
