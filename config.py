@@ -5,17 +5,25 @@ from typing import Optional, Literal, NamedTuple
 from discord.ext import commands
 from dotenv import load_dotenv
 import json
-with open('./json/config.json') as sysinfo_file:
-    sysinfo: dict = json.load(sysinfo_file)
+
 with open("./json/config-template.json") as sysinfo_check_file:
     sysinfo_check: dict = json.load(sysinfo_check_file)
+
+if not os.path.isfile('./json/config.json'):
+    with open('./json/config.json', "w") as w_sysinfo:
+        json.dump(sysinfo_check, w_sysinfo, indent=2)
+    print("Warning: json/config.json file not found. Created config.json using default template")
+
+with open('./json/config.json') as sysinfo_file:
+    sysinfo: dict = json.load(sysinfo_file)
+
 for key in sysinfo_check.keys():
     if key not in sysinfo.keys():
         print("New config field not present in old config.json!\n"
               "Attempting to fix the issue by copying the field from the template...")
         sysinfo[key] = sysinfo_check[key]
         with open('./json/config.json', "w") as w_sysinfo:
-            json.dump(sysinfo, w_sysinfo, ensure_ascii=False, intent=2)
+            json.dump(sysinfo, w_sysinfo, ensure_ascii=False, indent=2)
 with open('./json/version-info.json') as version_info_handle:
     raw_version_info: dict = json.load(version_info_handle)
 with open('./json/emoji-database.json') as emoji_db_handle:
@@ -59,7 +67,6 @@ load_dotenv("./.env")
 token: Optional[str] = os.getenv(f"BOT_TOKEN")
 prefix: str = sysinfo["prefix"]
 # noinspection SpellCheckingInspection
-revnobux_db_path: str = sysinfo["revnobux_db_path"]
 version_string: str = f'{version_info.major}.{version_info.minor}.{version_info.micro}'
 github_version: str = f'v{version_string}'
 version: str = f'{version_string} {version_info.version_code}'
