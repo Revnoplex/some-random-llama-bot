@@ -154,6 +154,3 @@ tokens.txt
 
 # exclude test service file
 some-random-llama-bot-testing.service
-
-# cog files created by autogen
-cogs/actions.py
