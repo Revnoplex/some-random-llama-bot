@@ -13,7 +13,7 @@ class Llama(config.RevnobotCog):
 
     def __init__(self, client: bridge.Bot):
         self.client = client
-        self.description = "Commands to interact with the llama llm"
+        self.description = "Commands to interact with llama 3.2"
         self.icon = "\U0001f999"
         self.hidden = False
         self.ollama_client = ollama.AsyncClient(config.ollama_server)
