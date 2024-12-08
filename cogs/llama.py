@@ -249,6 +249,65 @@ class Llama(config.RevnobotCog):
                 )
             )
 
+    # noinspection SpellCheckingInspection,PyTypeHints
+    @bridge.bridge_command(
+        name='ask-llama-3-3',
+        description="Ask the llama 3.3 llm",
+    )
+    @commands.bot_has_permissions(send_messages=True)
+    @commands.cooldown(**config.default_cooldown_options)
+    async def ask_llama_3_3_cmd(
+            self, ctx: bridge.Context, *, prompt: BridgeOption(str, "Prompt to send to llama"),
+    ):
+        """About the bot?"""
+        await ctx.defer()
+        try:
+            await self.ollama_client.ps()
+        except (httpx.ConnectError, httpx.TimeoutException):
+            app = await ctx.bot.application_info()
+            await ctx.respond(embed=utils.default_embed(
+                ctx, "Cannot Connect to Ollama Server.",
+                "Unable to connect to ollama server as it is probably not running. "
+                f"Please ask {app.owner.mention} to start the ollama server."
+            ))
+            return
+        except httpx.HTTPError as error:
+            await ctx.respond(embed=utils.default_embed(
+                ctx, "Error Connecting to Ollama Server.",
+                f"There was a problem trying to connect to the ollama server: {error}"
+            ))
+            return
+        try:
+            async with ctx.typing() if not isinstance(ctx, discord.ApplicationContext) else nullcontext():
+                response = await self.ollama_client.chat(
+                    model="llama3.3:latest", messages=[
+                        {
+                            'role': 'user',
+                            'content': prompt,
+                        },
+                    ]
+                )
+        except ollama.ResponseError as error:
+            await ctx.respond(embed=utils.default_embed(
+                ctx, "Error Genrating Response",
+                f"{error.error}"
+            ))
+            return
+        if len(response.message.content) <= 2000:
+            await ctx.respond(f"{response.message.content}")
+        elif len(response.message.content) <= 4096:
+            await ctx.respond(
+                embed=utils.default_embed(ctx, "Llama 3.3 Response", f"{response.message.content}")
+            )
+        else:
+            await ctx.respond(
+                embed=utils.default_embed(
+                    ctx, "Response Too large",
+                    f"Llama sent a response longer that the maximum amount of characters allowed on discord (4096). "
+                    f"Please tell llama to limit the response to 4096 characters."
+                )
+            )
+
 
 def setup(client):
     client.add_cog(Llama(client))
