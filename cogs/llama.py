@@ -280,7 +280,7 @@ class Llama(config.RevnobotCog):
         try:
             async with ctx.typing() if not isinstance(ctx, discord.ApplicationContext) else nullcontext():
                 response = await self.ollama_client.chat(
-                    model="llama3.3:latest", messages=[
+                    model="llama3.3:70b-instruct-q8_0", messages=[
                         {
                             'role': 'user',
                             'content': prompt,
