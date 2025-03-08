@@ -1,5 +1,4 @@
 from contextlib import nullcontext
-
 import discord
 import httpx
 import ollama
@@ -22,8 +21,8 @@ class Llama(config.RevnobotCog):
     @bridge.bridge_command(
         name='ask-llama',
         description="Ask the llama llm",
+        integration_types={discord.IntegrationType.guild_install, discord.IntegrationType.user_install}
     )
-    @commands.bot_has_permissions(send_messages=True)
     @commands.cooldown(**config.default_cooldown_options)
     async def ask_llama_cmd(
             self, ctx: bridge.Context, *, prompt: BridgeOption(str, "Prompt to send to llama"),
@@ -95,8 +94,8 @@ class Llama(config.RevnobotCog):
     @bridge.bridge_command(
         name='ask-llama-vision',
         description="Ask the llama-vision llm",
+        integration_types={discord.IntegrationType.guild_install, discord.IntegrationType.user_install}
     )
-    @commands.bot_has_permissions(send_messages=True)
     @commands.cooldown(**config.default_cooldown_options)
     async def ask_llama_vision_cmd(
             self, ctx: bridge.Context, *, prompt: BridgeOption(str, "Prompt to send to llama"),
@@ -180,8 +179,8 @@ class Llama(config.RevnobotCog):
     @bridge.bridge_command(
         name='llama-text',
         description="Send a sample of text for llama to extend",
+        integration_types={discord.IntegrationType.guild_install, discord.IntegrationType.user_install}
     )
-    @commands.bot_has_permissions(send_messages=True)
     @commands.cooldown(**config.default_cooldown_options)
     async def llama_text_cmd(
             self, ctx: bridge.Context, *, prompt: BridgeOption(str, "Prompt to send to llama"),
@@ -253,8 +252,8 @@ class Llama(config.RevnobotCog):
     @bridge.bridge_command(
         name='ask-llama-3-3',
         description="Ask the llama 3.3 llm",
+        integration_types={discord.IntegrationType.guild_install, discord.IntegrationType.user_install}
     )
-    @commands.bot_has_permissions(send_messages=True)
     @commands.cooldown(**config.default_cooldown_options)
     async def ask_llama_3_3_cmd(
             self, ctx: bridge.Context, *, prompt: BridgeOption(str, "Prompt to send to llama"),
@@ -312,8 +311,8 @@ class Llama(config.RevnobotCog):
     @bridge.bridge_command(
         name='ask-qwq',
         description="Ask the qwq llm",
+        integration_types={discord.IntegrationType.guild_install, discord.IntegrationType.user_install}
     )
-    @commands.bot_has_permissions(send_messages=True)
     @commands.cooldown(**config.default_cooldown_options)
     async def ask_qwq_cmd(
             self, ctx: bridge.Context, *, prompt: BridgeOption(str, "Prompt to send to qwq"),
@@ -371,8 +370,8 @@ class Llama(config.RevnobotCog):
     @bridge.bridge_command(
         name='ask-deekseek',
         description="Ask the deekseek-r1 llm",
+        integration_types={discord.IntegrationType.guild_install, discord.IntegrationType.user_install}
     )
-    @commands.bot_has_permissions(send_messages=True)
     @commands.cooldown(**config.default_cooldown_options)
     async def ask_deekseek_cmd(
             self, ctx: bridge.Context, *, prompt: BridgeOption(str, "Prompt to send to qwq"),

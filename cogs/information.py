@@ -854,9 +854,9 @@ class Information(config.RevnobotCog):
     @bridge.bridge_command(
         name='about',
         description="About the bot?",
-        aliases=['botinfo', 'bot-info', 'bot_info', 'bio', 'ping', 'latency', 'info', 'uptime', 'version']
+        aliases=['botinfo', 'bot-info', 'bot_info', 'bio', 'ping', 'latency', 'info', 'uptime', 'version'],
+        integration_types={discord.IntegrationType.guild_install, discord.IntegrationType.user_install}
     )
-    @commands.bot_has_permissions(send_messages=True)
     @commands.cooldown(**config.default_cooldown_options)
     async def about_cmd(self, ctx: bridge.Context):
         """About the bot?"""
@@ -959,7 +959,6 @@ class Information(config.RevnobotCog):
         aliases=["add-bot", "add_bot", "add-app", "add_app"]
     )
     @commands.cooldown(**config.default_cooldown_options)
-    @commands.bot_has_permissions(send_messages=True)
     async def invite_cmd(self, ctx: bridge.Context):
         """Invite the bot to your server"""
         view = utils.DefaultView(discord.ui.Button(style=discord.ButtonStyle.blurple, label="Add Bot",
