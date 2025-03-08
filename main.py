@@ -1,4 +1,4 @@
-#!./venv/bin/python3.13
+#!./venv/bin/python3
 import asyncio
 import signal
 import sys
