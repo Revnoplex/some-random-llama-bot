@@ -35,7 +35,7 @@ class Llama(config.RevnobotCog):
         await ctx.defer()
         try:
             await self.ollama_client.ps()
-        except (httpx.ConnectError, httpx.TimeoutException):
+        except (httpx.ConnectError, httpx.TimeoutException, ConnectionError):
             app = await ctx.bot.application_info()
             await ctx.respond(embed=utils.default_embed(
                 ctx, "Cannot Connect to Ollama Server.",
@@ -118,7 +118,7 @@ class Llama(config.RevnobotCog):
             images.append(image_bytes)
         try:
             await self.ollama_client.ps()
-        except (httpx.ConnectError, httpx.TimeoutException):
+        except (httpx.ConnectError, httpx.TimeoutException, ConnectionError):
             app = await ctx.bot.application_info()
             await ctx.respond(embed=utils.default_embed(
                 ctx, "Cannot Connect to Ollama Server.",
@@ -193,7 +193,7 @@ class Llama(config.RevnobotCog):
         await ctx.defer()
         try:
             await self.ollama_client.ps()
-        except (httpx.ConnectError, httpx.TimeoutException):
+        except (httpx.ConnectError, httpx.TimeoutException, ConnectionError):
             app = await ctx.bot.application_info()
             await ctx.respond(embed=utils.default_embed(
                 ctx, "Cannot Connect to Ollama Server.",
@@ -262,7 +262,7 @@ class Llama(config.RevnobotCog):
         await ctx.defer()
         try:
             await self.ollama_client.ps()
-        except (httpx.ConnectError, httpx.TimeoutException):
+        except (httpx.ConnectError, httpx.TimeoutException, ConnectionError):
             app = await ctx.bot.application_info()
             await ctx.respond(embed=utils.default_embed(
                 ctx, "Cannot Connect to Ollama Server.",
@@ -321,7 +321,7 @@ class Llama(config.RevnobotCog):
         await ctx.defer()
         try:
             await self.ollama_client.ps()
-        except (httpx.ConnectError, httpx.TimeoutException):
+        except (httpx.ConnectError, httpx.TimeoutException, ConnectionError):
             app = await ctx.bot.application_info()
             await ctx.respond(embed=utils.default_embed(
                 ctx, "Cannot Connect to Ollama Server.",
@@ -380,7 +380,7 @@ class Llama(config.RevnobotCog):
         await ctx.defer()
         try:
             await self.ollama_client.ps()
-        except (httpx.ConnectError, httpx.TimeoutException):
+        except (httpx.ConnectError, httpx.TimeoutException, ConnectionError):
             app = await ctx.bot.application_info()
             await ctx.respond(embed=utils.default_embed(
                 ctx, "Cannot Connect to Ollama Server.",
