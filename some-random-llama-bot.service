@@ -1,10 +1,10 @@
 [Unit]
-Description=Systemd service for running SomeRandomLlamaBot on the server with LLama
+Description=Systemd service for running SomeRandomLlamaBot on the server with Ollama
 After=network.target
 
 [Service]
-ExecStart=/home/server-admin/bots/SomeRandomLlamaBot/main.py --systemd
-WorkingDirectory=/home/server-admin/bots/SomeRandomLlamaBot
+ExecStart=/home/server-admin/bots/some-random-llama-bot/main.py --systemd
+WorkingDirectory=/home/server-admin/bots/some-random-llama-bot
 StandardOutput=inherit
 StandardError=inherit
 Restart=on-failure
