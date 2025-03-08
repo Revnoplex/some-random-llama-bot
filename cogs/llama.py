@@ -339,7 +339,7 @@ class Llama(config.RevnobotCog):
         try:
             async with ctx.typing() if not isinstance(ctx, discord.ApplicationContext) else nullcontext():
                 response = await self.ollama_client.chat(
-                    model="qwq:32b-preview-fp16", messages=[
+                    model="qwq:32b-fp16", messages=[
                         {
                             'role': 'user',
                             'content': prompt,
@@ -364,6 +364,65 @@ class Llama(config.RevnobotCog):
                     ctx, "Response Too large",
                     f"QwQ sent a response longer that the maximum amount of characters allowed on discord (4096). "
                     f"Please tell qwq to limit the response to 4096 characters."
+                )
+            )
+
+    # noinspection SpellCheckingInspection,PyTypeHints
+    @bridge.bridge_command(
+        name='ask-deekseek',
+        description="Ask the deekseek-r1 llm",
+    )
+    @commands.bot_has_permissions(send_messages=True)
+    @commands.cooldown(**config.default_cooldown_options)
+    async def ask_deekseek_cmd(
+            self, ctx: bridge.Context, *, prompt: BridgeOption(str, "Prompt to send to qwq"),
+    ):
+        """About the bot?"""
+        await ctx.defer()
+        try:
+            await self.ollama_client.ps()
+        except (httpx.ConnectError, httpx.TimeoutException):
+            app = await ctx.bot.application_info()
+            await ctx.respond(embed=utils.default_embed(
+                ctx, "Cannot Connect to Ollama Server.",
+                "Unable to connect to ollama server as it is probably not running. "
+                f"Please ask {app.owner.mention} to start the ollama server."
+            ))
+            return
+        except httpx.HTTPError as error:
+            await ctx.respond(embed=utils.default_embed(
+                ctx, "Error Connecting to Ollama Server.",
+                f"There was a problem trying to connect to the ollama server: {error}"
+            ))
+            return
+        try:
+            async with ctx.typing() if not isinstance(ctx, discord.ApplicationContext) else nullcontext():
+                response = await self.ollama_client.chat(
+                    model="deepseek-r1:32b-qwen-distill-fp16", messages=[
+                        {
+                            'role': 'user',
+                            'content': prompt,
+                        },
+                    ]
+                )
+        except ollama.ResponseError as error:
+            await ctx.respond(embed=utils.default_embed(
+                ctx, "Error Genrating Response",
+                f"{error.error}"
+            ))
+            return
+        if len(response.message.content) <= 2000:
+            await ctx.respond(f"{response.message.content}")
+        elif len(response.message.content) <= 4096:
+            await ctx.respond(
+                embed=utils.default_embed(ctx, "Deekseek-R1 Response", f"{response.message.content}")
+            )
+        else:
+            await ctx.respond(
+                embed=utils.default_embed(
+                    ctx, "Response Too large",
+                    f"Deekseek-R1 sent a response longer that the maximum amount of characters allowed on "
+                    f"discord (4096). Please tell deepseek to limit the response to 4096 characters."
                 )
             )
 
