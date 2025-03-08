@@ -8,7 +8,7 @@ import config
 import utils
 
 
-class Llama(config.RevnobotCog):
+class Ollama(config.RevnobotCog):
 
     def __init__(self, client: bridge.Bot):
         self.client = client
@@ -427,4 +427,4 @@ class Llama(config.RevnobotCog):
 
 
 def setup(client):
-    client.add_cog(Llama(client))
+    client.add_cog(Ollama(client))

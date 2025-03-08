@@ -863,7 +863,7 @@ class Information(config.RevnobotCog):
         app = await self.client.application_info()
 
         embed = utils.default_embed(ctx, f'{self.client.user.display_name}',
-                                    f'Some random bot that interacts with the llama LLM')
+                                    f'Some random bot that interacts with ollama LLMs')
         embed.set_thumbnail(url=self.client.user.display_avatar.url)
         embed.add_field(name=':tools: Version', value=f'{config.version_string}')
         embed.add_field(name=":1234: Discord ID", value=f'{str(self.client.user.id)}')
