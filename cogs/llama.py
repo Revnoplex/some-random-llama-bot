@@ -7,6 +7,8 @@ from discord.ext.bridge import BridgeOption
 import config
 import utils
 
+context_bank = {}
+
 
 class Ollama(config.RevnobotCog):
 
@@ -61,15 +63,17 @@ class Ollama(config.RevnobotCog):
             return
         try:
             async with ctx.typing() if not isinstance(ctx, discord.ApplicationContext) else nullcontext():
+                message = {
+                    'role': 'user',
+                    'content': prompt,
+                    'system': 'your response will be sent over discord, so please make sure your entire '
+                              'response is limited to 4096 characters'
+                }
+                if ctx.channel.id not in context_bank:
+                    context_bank[ctx.channel.id] = []
+                context_bank[ctx.channel.id].append(message)
                 response = await self.ollama_client.chat(
-                    model=model_id, messages=[
-                        {
-                            'role': 'user',
-                            'content': prompt,
-                            'system': 'your response will be sent over discord, so please make sure your entire '
-                                      'response is limited to 4096 characters'
-                        },
-                    ]
+                    model=model_id, messages=context_bank[ctx.channel.id]
                 )
         except ollama.ResponseError as error:
             await ctx.respond(embed=utils.default_embed(
@@ -77,6 +81,7 @@ class Ollama(config.RevnobotCog):
                 f"{error.error}"
             ))
             return
+        context_bank[ctx.channel.id].append({'role': 'assistant', 'content': response.message.content})
         if len(response.message.content) <= 2000:
             await ctx.respond(f"{response.message.content}")
         elif len(response.message.content) <= 4096:
@@ -147,16 +152,18 @@ class Ollama(config.RevnobotCog):
             return
         try:
             async with ctx.typing() if not isinstance(ctx, discord.ApplicationContext) else nullcontext():
+                message = {
+                    'role': 'user',
+                    'content': prompt,
+                    'images': images,
+                    'system': 'your response will be sent over discord, so please make sure your entire '
+                              'response is limited to 4096 characters'
+                }
+                if ctx.channel.id not in context_bank:
+                    context_bank[ctx.channel.id] = []
+                context_bank[ctx.channel.id].append(message)
                 response = await self.ollama_client.chat(
-                    model=model_id, messages=[
-                        {
-                            'role': 'user',
-                            'content': prompt,
-                            'images': images,
-                            'system': 'your response will be sent over discord, so please make sure your entire '
-                                      'response is limited to 4096 characters'
-                        },
-                    ]
+                    model=model_id, messages=context_bank[ctx.channel.id]
                 )
         except ollama.ResponseError as error:
             await ctx.respond(embed=utils.default_embed(
@@ -164,6 +171,7 @@ class Ollama(config.RevnobotCog):
                 f"{error.error}"
             ))
             return
+        context_bank[ctx.channel.id].append({'role': 'assistant', 'content': response.message.content})
         if len(response.message.content) <= 2000:
             await ctx.respond(f"{response.message.content}")
         elif len(response.message.content) <= 4096:
@@ -223,15 +231,17 @@ class Ollama(config.RevnobotCog):
             return
         try:
             async with ctx.typing() if not isinstance(ctx, discord.ApplicationContext) else nullcontext():
+                message = {
+                    'role': 'user',
+                    'content': prompt,
+                    'system': 'your response will be sent over discord, so please make sure your entire '
+                              'response is limited to 4096 characters'
+                }
+                if ctx.channel.id not in context_bank:
+                    context_bank[ctx.channel.id] = []
+                context_bank[ctx.channel.id].append(message)
                 response = await self.ollama_client.chat(
-                    model=model_id, messages=[
-                        {
-                            'role': 'user',
-                            'content': prompt,
-                            'system': 'your response will be sent over discord, so please make sure your entire '
-                                      'response is limited to 4096 characters'
-                        },
-                    ]
+                    model=model_id, messages=context_bank[ctx.channel.id]
                 )
         except ollama.ResponseError as error:
             await ctx.respond(embed=utils.default_embed(
@@ -239,6 +249,7 @@ class Ollama(config.RevnobotCog):
                 f"{error.error}"
             ))
             return
+        context_bank[ctx.channel.id].append({'role': 'assistant', 'content': response.message.content})
         if len(response.message.content) <= 2000:
             await ctx.respond(f"{response.message.content}")
         elif len(response.message.content) <= 4096:
@@ -284,15 +295,17 @@ class Ollama(config.RevnobotCog):
             return
         try:
             async with ctx.typing() if not isinstance(ctx, discord.ApplicationContext) else nullcontext():
+                message = {
+                    'role': 'user',
+                    'content': prompt,
+                    'system': 'your response will be sent over discord, so please make sure your entire '
+                              'response is limited to 4096 characters'
+                }
+                if ctx.channel.id not in context_bank:
+                    context_bank[ctx.channel.id] = []
+                context_bank[ctx.channel.id].append(message)
                 response = await self.ollama_client.chat(
-                    model="llama3.3:70b-instruct-q8_0", messages=[
-                        {
-                            'role': 'user',
-                            'content': prompt,
-                            'system': 'your response will be sent over discord, so please make sure your entire '
-                                      'response is limited to 4096 characters'
-                        },
-                    ]
+                    model="llama3.3:70b-instruct-q8_0", messages=context_bank[ctx.channel.id]
                 )
         except ollama.ResponseError as error:
             await ctx.respond(embed=utils.default_embed(
@@ -300,6 +313,7 @@ class Ollama(config.RevnobotCog):
                 f"{error.error}"
             ))
             return
+        context_bank[ctx.channel.id].append({'role': 'assistant', 'content': response.message.content})
         if len(response.message.content) <= 2000:
             await ctx.respond(f"{response.message.content}")
         elif len(response.message.content) <= 4096:
@@ -348,15 +362,17 @@ class Ollama(config.RevnobotCog):
             return
         try:
             async with ctx.typing() if not isinstance(ctx, discord.ApplicationContext) else nullcontext():
+                message = {
+                    'role': 'user',
+                    'content': prompt,
+                    'system': 'your response will be sent over discord, so please make sure your entire '
+                              'response is limited to 4096 characters'
+                }
+                if ctx.channel.id not in context_bank:
+                    context_bank[ctx.channel.id] = []
+                context_bank[ctx.channel.id].append(message)
                 response = await self.ollama_client.chat(
-                    model="qwq:32b-fp16", messages=[
-                        {
-                            'role': 'user',
-                            'content': prompt,
-                            'system': 'your response will be sent over discord, so please make sure your entire '
-                                      'response is limited to 4096 characters'
-                        },
-                    ]
+                    model="qwq:32b-fp16", messages=context_bank[ctx.channel.id]
                 )
         except ollama.ResponseError as error:
             await ctx.respond(embed=utils.default_embed(
@@ -364,6 +380,7 @@ class Ollama(config.RevnobotCog):
                 f"{error.error}"
             ))
             return
+        context_bank[ctx.channel.id].append({'role': 'assistant', 'content': response.message.content})
         if show_thinking:
             response_content = (
                 response.message.content.split("\n</think>")[0].replace(
@@ -423,15 +440,17 @@ class Ollama(config.RevnobotCog):
             return
         try:
             async with ctx.typing() if not isinstance(ctx, discord.ApplicationContext) else nullcontext():
+                message = {
+                    'role': 'user',
+                    'content': prompt,
+                    'system': 'your response will be sent over discord, so please make sure your entire '
+                              'response is limited to 4096 characters'
+                }
+                if ctx.channel.id not in context_bank:
+                    context_bank[ctx.channel.id] = []
+                context_bank[ctx.channel.id].append(message)
                 response = await self.ollama_client.chat(
-                    model="deepseek-r1:32b-qwen-distill-fp16", messages=[
-                        {
-                            'role': 'user',
-                            'content': prompt,
-                            'system': 'your response will be sent over discord, so please make sure your entire '
-                                      'response is limited to 4096 characters'
-                        },
-                    ]
+                    model="deepseek-r1:32b-qwen-distill-fp16", messages=context_bank[ctx.channel.id]
                 )
         except ollama.ResponseError as error:
             await ctx.respond(embed=utils.default_embed(
@@ -439,6 +458,7 @@ class Ollama(config.RevnobotCog):
                 f"{error.error}"
             ))
             return
+        context_bank[ctx.channel.id].append({'role': 'assistant', 'content': response.message.content})
         if show_thinking:
             response_content = (
                 response.message.content.split("\n</think>")[0].replace(
