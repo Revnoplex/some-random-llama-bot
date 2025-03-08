@@ -12,7 +12,7 @@ class Ollama(config.RevnobotCog):
 
     def __init__(self, client: bridge.Bot):
         self.client = client
-        self.description = "Commands to interact with llama 3.2"
+        self.description = "Commands to interact with ollama LLMs"
         self.icon = "\U0001f999"
         self.hidden = False
         self.ollama_client = ollama.AsyncClient(config.ollama_server)
@@ -66,6 +66,8 @@ class Ollama(config.RevnobotCog):
                         {
                             'role': 'user',
                             'content': prompt,
+                            'system': 'your response will be sent over discord, so please make sure your entire '
+                                      'response is limited to 4096 characters'
                         },
                     ]
                 )
@@ -150,7 +152,9 @@ class Ollama(config.RevnobotCog):
                         {
                             'role': 'user',
                             'content': prompt,
-                            'images': images
+                            'images': images,
+                            'system': 'your response will be sent over discord, so please make sure your entire '
+                                      'response is limited to 4096 characters'
                         },
                     ]
                 )
@@ -224,6 +228,8 @@ class Ollama(config.RevnobotCog):
                         {
                             'role': 'user',
                             'content': prompt,
+                            'system': 'your response will be sent over discord, so please make sure your entire '
+                                      'response is limited to 4096 characters'
                         },
                     ]
                 )
@@ -283,6 +289,8 @@ class Ollama(config.RevnobotCog):
                         {
                             'role': 'user',
                             'content': prompt,
+                            'system': 'your response will be sent over discord, so please make sure your entire '
+                                      'response is limited to 4096 characters'
                         },
                     ]
                 )
@@ -316,6 +324,9 @@ class Ollama(config.RevnobotCog):
     @commands.cooldown(**config.default_cooldown_options)
     async def ask_qwq_cmd(
             self, ctx: bridge.Context, *, prompt: BridgeOption(str, "Prompt to send to qwq"),
+            show_thinking: BridgeOption(
+                bool, "Show <think></think> part of the response", default=True, name="show-thinking"
+            ) = True
     ):
         """About the bot?"""
         await ctx.defer()
@@ -342,6 +353,8 @@ class Ollama(config.RevnobotCog):
                         {
                             'role': 'user',
                             'content': prompt,
+                            'system': 'your response will be sent over discord, so please make sure your entire '
+                                      'response is limited to 4096 characters'
                         },
                     ]
                 )
@@ -351,11 +364,22 @@ class Ollama(config.RevnobotCog):
                 f"{error.error}"
             ))
             return
-        if len(response.message.content) <= 2000:
-            await ctx.respond(f"{response.message.content}")
-        elif len(response.message.content) <= 4096:
+        if show_thinking:
+            response_content = (
+                response.message.content.split("\n</think>")[0].replace(
+                    "\n", "\n> "
+                ).replace(
+                    "<think>", "> ### Thinking"
+                ) + "\n\n" +
+                response.message.content.split("</think>\n\n")[-1]
+            )
+        else:
+            response_content = response.message.content.split("</think>\n\n")[-1]
+        if len(response_content) <= 2000:
+            await ctx.respond(f"{response_content}")
+        elif len(response_content) <= 4096:
             await ctx.respond(
-                embed=utils.default_embed(ctx, "QwQ Response", f"{response.message.content}")
+                embed=utils.default_embed(ctx, "QwQ Response", f"{response_content}")
             )
         else:
             await ctx.respond(
@@ -374,7 +398,10 @@ class Ollama(config.RevnobotCog):
     )
     @commands.cooldown(**config.default_cooldown_options)
     async def ask_deekseek_cmd(
-            self, ctx: bridge.Context, *, prompt: BridgeOption(str, "Prompt to send to qwq"),
+            self, ctx: bridge.Context, *, prompt: BridgeOption(str, "Prompt to send to deekseek"),
+            show_thinking: BridgeOption(
+                bool, "Show <think></think> part of the response", default=True, name="show-thinking"
+            ) = True
     ):
         """About the bot?"""
         await ctx.defer()
@@ -401,6 +428,8 @@ class Ollama(config.RevnobotCog):
                         {
                             'role': 'user',
                             'content': prompt,
+                            'system': 'your response will be sent over discord, so please make sure your entire '
+                                      'response is limited to 4096 characters'
                         },
                     ]
                 )
@@ -410,11 +439,22 @@ class Ollama(config.RevnobotCog):
                 f"{error.error}"
             ))
             return
-        if len(response.message.content) <= 2000:
-            await ctx.respond(f"{response.message.content}")
-        elif len(response.message.content) <= 4096:
+        if show_thinking:
+            response_content = (
+                response.message.content.split("\n</think>")[0].replace(
+                    "\n", "\n> "
+                ).replace(
+                    "<think>", "> ### Thinking"
+                ) + "\n\n" +
+                response.message.content.split("</think>\n\n")[-1]
+            )
+        else:
+            response_content = response.message.content.split("</think>\n\n")[-1]
+        if len(response_content) <= 2000:
+            await ctx.respond(f"{response_content}")
+        elif len(response_content) <= 4096:
             await ctx.respond(
-                embed=utils.default_embed(ctx, "Deekseek-R1 Response", f"{response.message.content}")
+                embed=utils.default_embed(ctx, "Deekseek-R1 Response", f"{response_content}")
             )
         else:
             await ctx.respond(
