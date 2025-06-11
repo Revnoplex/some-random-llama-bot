@@ -77,6 +77,29 @@ debug_mode: bool = sysinfo["debug mode"]
 log_messages: bool = sysinfo["log messages"]
 logging_excluded: list = sysinfo["logging excluded"]
 ollama_server: str = sysinfo["ollama_server"]
+
+with open("./json/server-profile-template.json") as profile_template_fp:
+    profile_template: dict = json.load(profile_template_fp)
+
+if not os.path.isfile('./json/server-profiles.json'):
+    with open('./json/server-profiles.json', "w") as w_server_profiles:
+        new_profiles = {
+            ollama_server: profile_template
+        }
+        json.dump(new_profiles, w_server_profiles, indent=2)
+    print("Warning: json/server-profiles.json file not found. Created server-profiles.json using default template")
+
+with open('./json/server-profiles.json') as r_server_profiles:
+    server_profiles = json.load(r_server_profiles)
+
+if ollama_server not in server_profiles:
+    server_profiles[ollama_server] = profile_template
+    with open('./json/server-profiles.json', "w") as w_server_profiles:
+        json.dump(server_profiles, w_server_profiles, indent=2)
+    print(f"Created new profile for {ollama_server} from template")
+
+current_profile = server_profiles[ollama_server]
+
 ascii_colour = "\033[0m"
 version_int = 0
 if version_code == "alpha":

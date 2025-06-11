@@ -54,7 +54,7 @@ class Ollama(config.RevnobotCog):
         available_models = [model.model for model in (await self.ollama_client.list()).models]
         if prompt.split()[0].upper() in ['1B', '3B']:
             model = prompt.split()[0].upper()
-        model_id = {"1B": "llama3.2:1b-instruct-fp16", "3B": "llama3.2:3b-instruct-fp16"}[model]
+        model_id = {"1B": config.current_profile['llama3.2-1b'], "3B": config.current_profile['llama3.2-3b']}[model]
         if model_id not in available_models:
             await ctx.respond(embed=utils.default_embed(
                 ctx, "Model Not Found",
@@ -143,7 +143,10 @@ class Ollama(config.RevnobotCog):
 
         if prompt.split()[0].upper() in ['11B', '90B']:
             model = prompt.split()[0].upper()
-        model_id = {"11B": "llama3.2-vision:11b-instruct-fp16", "90B": "llama3.2-vision:90b"}[model]
+        model_id = {
+            "11B": config.current_profile['llama3.2-vision-11b'],
+            "90B": config.current_profile['llama3.2-vision-90b']
+        }[model]
         if model_id not in available_models:
             await ctx.respond(embed=utils.default_embed(
                 ctx, "Model Not Found",
@@ -222,7 +225,10 @@ class Ollama(config.RevnobotCog):
         available_models = [model.model for model in (await self.ollama_client.list()).models]
         if prompt.split()[0].upper() in ['1B', '3B']:
             model = prompt.split()[0].upper()
-        model_id = {"1B": "llama3.2:1b-text-fp16", "3B": "llama3.2:3b-text-fp16"}[model]
+        model_id = {
+            "1B": config.current_profile['llama3.2-text-1b'],
+            "3B": config.current_profile['llama3.2-text-3b']
+        }[model]
         if model_id not in available_models:
             await ctx.respond(embed=utils.default_embed(
                 ctx, "Model Not Found",
@@ -305,7 +311,7 @@ class Ollama(config.RevnobotCog):
                     context_bank[ctx.channel.id] = []
                 context_bank[ctx.channel.id].append(message)
                 response = await self.ollama_client.chat(
-                    model="llama3.3:70b-instruct-q8_0", messages=context_bank[ctx.channel.id]
+                    model=config.current_profile['llama3.3'], messages=context_bank[ctx.channel.id]
                 )
         except ollama.ResponseError as error:
             await ctx.respond(embed=utils.default_embed(
@@ -372,7 +378,7 @@ class Ollama(config.RevnobotCog):
                     context_bank[ctx.channel.id] = []
                 context_bank[ctx.channel.id].append(message)
                 response = await self.ollama_client.chat(
-                    model="qwq:32b-fp16", messages=context_bank[ctx.channel.id]
+                    model=config.current_profile['qwq'], messages=context_bank[ctx.channel.id]
                 )
         except ollama.ResponseError as error:
             await ctx.respond(embed=utils.default_embed(
@@ -450,7 +456,7 @@ class Ollama(config.RevnobotCog):
                     context_bank[ctx.channel.id] = []
                 context_bank[ctx.channel.id].append(message)
                 response = await self.ollama_client.chat(
-                    model="deepseek-r1:32b-qwen-distill-fp16", messages=context_bank[ctx.channel.id]
+                    model=config.current_profile['deepseek-r1'], messages=context_bank[ctx.channel.id]
                 )
         except ollama.ResponseError as error:
             await ctx.respond(embed=utils.default_embed(
@@ -536,7 +542,7 @@ class Ollama(config.RevnobotCog):
                     context_bank[ctx.channel.id] = []
                 context_bank[ctx.channel.id].append(message)
                 response = await self.ollama_client.chat(
-                    model="gemma3:27b-it-fp16", messages=context_bank[ctx.channel.id]
+                    model=config.current_profile['gemma3'], messages=context_bank[ctx.channel.id]
                 )
         except ollama.ResponseError as error:
             await ctx.respond(embed=utils.default_embed(

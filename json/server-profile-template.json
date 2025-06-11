@@ -1,0 +1,12 @@
+{
+  "llama3.2-1b": "llama3.2:1b",
+  "llama3.2-3b": "llama3.2:3b",
+  "llama3.2-vision-11b": "llama3.2-vision:11b",
+  "llama3.2-vision-90b": "llama3.2-vision:90b",
+  "llama3.2-text-1b": "llama3.2:1b-text-q8_0",
+  "llama3.2-text-3b": "llama3.2:3b-text-q4_K_M",
+  "llama3.3": "llama3.3:70b",
+  "qwq": "qwq:32b",
+  "deepseek-r1": "deepseek-r1:8b",
+  "gemma3": "gemma3:4b"
+}

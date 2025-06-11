@@ -140,6 +140,7 @@ json/guilds/*.json
 json/guilds/archived guilds/*.json
 json/counting-channels/*.json
 json/up-since.json
+json/server-profiles.json
 
 # exclude logs
 *.log
