@@ -205,10 +205,10 @@ class Errors(config.RevnobotCog):
                                             f'Sorry, but {ctx.bot.user.mention} has encountered an unexpected error.\n'
                                             f'A report has been sent to the developer **@{owner_name}**. Please '
                                             f'[report this error]'
-                                            f'(https://github.com/Revnoplex/revnobot-public/issues/new'
+                                            f'(https://github.com/Revnoplex/some-random-llama-bot/issues/new'
                                             f'?assignees=&labels=bug+tagged+with+error+id'
                                             f'&template=unexpected-error-report.md&title=User+Reported+Bug) on '
-                                            f'[the public github](https://github.com/Revnoplex/revnobot-public),'
+                                            f'[the github repository](https://github.com/Revnoplex/some-random-llama-bot),'
                                             f' and make sure to specify the following error ID: `{error_id}` and '
                                             f'specify any extra information regarding the error.',
                                             discord.Colour.red(),
