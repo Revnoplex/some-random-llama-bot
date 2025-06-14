@@ -398,12 +398,11 @@ class Ollama(config.RevnobotCog):
         context_bank[ctx.channel.id].append({'role': 'assistant', 'content': response.message.content})
         if show_thinking:
             response_content = (
-                response.message.content.split("\n</think>")[0].replace(
-                    "\n", "\n> "
-                ).replace(
-                    "<think>", "> ### Thinking"
-                ) + "\n\n" +
-                response.message.content.split("</think>\n\n")[-1]
+                    "-# **Thinking**...\n-# " +
+                    response.message.content.split("\n</think>")[0].replace("<think>\n\n", "").replace(
+                        "\n", "\n-# "
+                    ).replace("\n-# \n", "\n-# ** **\n").rsplit("-# ", 1)[0]
+                    + response.message.content.split("</think>\n\n")[-1]
             )
         else:
             response_content = response.message.content.split("</think>\n\n")[-1]
@@ -418,7 +417,7 @@ class Ollama(config.RevnobotCog):
                 embed=utils.default_embed(
                     ctx, "Response Too large",
                     f"QwQ sent a response longer that the maximum amount of characters allowed on discord (4096). "
-                    f"Please tell qwq to limit the response to 4096 characters."
+                    f"Try setting show-thinking to False"
                 )
             )
 
@@ -431,11 +430,10 @@ class Ollama(config.RevnobotCog):
     @commands.cooldown(**config.default_cooldown_options)
     async def ask_deekseek_cmd(
             self, ctx: bridge.Context, *, prompt: BridgeOption(str, "Prompt to send to deekseek"),
-            show_thinking: BridgeOption(
-                bool, "Show <think></think> part of the response", default=True, name="show-thinking"
+            enable_thinking: BridgeOption(
+                bool, "Enable the LLM to output thinking", default=True, name="enable-thinking"
             ) = True
     ):
-        """About the bot?"""
         await ctx.defer()
         try:
             await self.ollama_client.ps()
@@ -465,7 +463,8 @@ class Ollama(config.RevnobotCog):
                     context_bank[ctx.channel.id] = []
                 context_bank[ctx.channel.id].append(message)
                 response = await self.ollama_client.chat(
-                    model=config.current_profile['available']['deepseek-r1'], messages=context_bank[ctx.channel.id]
+                    model=config.current_profile['available']['deepseek-r1'], messages=context_bank[ctx.channel.id],
+                    think=enable_thinking
                 )
         except ollama.ResponseError as error:
             await ctx.respond(embed=utils.default_embed(
@@ -474,17 +473,21 @@ class Ollama(config.RevnobotCog):
             ))
             return
         context_bank[ctx.channel.id].append({'role': 'assistant', 'content': response.message.content})
-        if show_thinking:
+        if response.message.thinking:
             response_content = (
-                response.message.content.split("\n</think>")[0].replace(
-                    "\n", "\n> "
-                ).replace(
-                    "<think>", "> ### Thinking"
-                ) + "\n\n" +
-                response.message.content.split("</think>\n\n")[-1]
+                    "-# **Thinking**...\n-# " +
+                    response.message.thinking.replace(
+                        "\n", "\n-# "
+                    ).replace("\n-# \n", "\n-# ** **\n").rsplit("-# ", 1)[0]
+                    + "\n" + response.message.content
+            )
+        elif enable_thinking and not response.message.thinking:
+            response_content = (
+                    ":warning: **WARNING**: thinking associated with the response is missing\n\n"
+                    + response.message.content
             )
         else:
-            response_content = response.message.content.split("</think>\n\n")[-1]
+            response_content = response.message.content
         if len(response_content) <= 2000:
             await ctx.respond(f"{response_content}")
         elif len(response_content) <= 4096:
@@ -496,7 +499,7 @@ class Ollama(config.RevnobotCog):
                 embed=utils.default_embed(
                     ctx, "Response Too large",
                     f"Deekseek-R1 sent a response longer that the maximum amount of characters allowed on "
-                    f"discord (4096). Please tell deepseek to limit the response to 4096 characters."
+                    f"discord (4096). Try disabling thinking."
                 )
             )
 
