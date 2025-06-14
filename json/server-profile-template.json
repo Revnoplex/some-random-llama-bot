@@ -1,12 +1,51 @@
 {
-  "llama3.2-1b": "llama3.2:1b",
-  "llama3.2-3b": "llama3.2:3b",
-  "llama3.2-vision-11b": "llama3.2-vision:11b",
-  "llama3.2-vision-90b": "llama3.2-vision:90b",
-  "llama3.2-text-1b": "llama3.2:1b-text-q8_0",
-  "llama3.2-text-3b": "llama3.2:3b-text-q4_K_M",
-  "llama3.3": "llama3.3:70b",
-  "qwq": "qwq:32b",
-  "deepseek-r1": "deepseek-r1:8b",
-  "gemma3": "gemma3:4b"
+  "commands": {
+    "ask-llama": {
+      "enabled": true,
+      "options": {"1B": "llama3.2-1b", "3B": "llama3.2-3b"},
+      "default": "3B"
+    },
+    "ask-llama-vision": {
+      "enabled": true,
+      "options": {"11B": "llama3.2-vision:11b", "90B": "llama3.2-vision:90b"},
+      "default": "11B"
+    },
+    "llama-text": {
+      "enabled": true,
+      "options": {"1B": "llama3.2-text-1b", "3B": "llama3.2-text-3b"},
+      "default": "3B"
+    },
+    "ask-llama-3-3": {
+      "enabled": true,
+      "options": {"70B": "llama3.3"},
+      "default": "70B"
+    },
+    "ask-qwq": {
+      "enabled": true,
+      "options": {"32B": "qwq"},
+      "default": "32B"
+    },
+    "ask-deepseek": {
+      "enabled": true,
+      "options": {"8B": "deepseek-r1"},
+      "default": "8B"
+    },
+    "ask-gemma3": {
+      "enabled": true,
+      "options": {"4B": "gemma3"},
+      "default": "4B"
+    }
+  },
+  "available": {
+    "llama3.2-1b": "llama3.2:1b",
+    "llama3.2-3b": "llama3.2:3b",
+    "llama3.2-vision-11b": "llama3.2-vision:11b",
+    "llama3.2-vision-90b": "llama3.2-vision:90b",
+    "llama3.2-text-1b": "llama3.2:1b-text-q8_0",
+    "llama3.2-text-3b": "llama3.2:3b-text-q4_K_M",
+    "llama3.3": "llama3.3:70b",
+    "qwq": "qwq:32b",
+    "deepseek-r1": "deepseek-r1:8b",
+    "gemma3": "gemma3:4b"
+  }
 }

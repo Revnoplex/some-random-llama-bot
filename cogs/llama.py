@@ -30,8 +30,9 @@ class Ollama(config.RevnobotCog):
             self, ctx: bridge.Context, *, prompt: BridgeOption(str, "Prompt to send to llama"),
             model: BridgeOption(
                 str, "The llama model to use",
-                default="3B", choices=["1B", "3B"]
-            ) = "3B",
+                default=config.current_profile['commands']['ask-llama']['default'],
+                choices=config.current_profile['commands']['ask-llama']['options'].keys()
+            ) = config.current_profile['commands']['ask-llama']['default'],
     ):
         """About the bot?"""
         await ctx.defer()
@@ -52,9 +53,13 @@ class Ollama(config.RevnobotCog):
             ))
             return
         available_models = [model.model for model in (await self.ollama_client.list()).models]
-        if prompt.split()[0].upper() in ['1B', '3B']:
+        if prompt.split()[0].upper() in config.current_profile['commands'][
+            ctx.command.qualified_name
+        ]['options'].keys():
             model = prompt.split()[0].upper()
-        model_id = {"1B": config.current_profile['llama3.2-1b'], "3B": config.current_profile['llama3.2-3b']}[model]
+        model_id = config.current_profile['available'][
+            config.current_profile['commands'][ctx.command.qualified_name]['options'][model]
+        ]
         if model_id not in available_models:
             await ctx.respond(embed=utils.default_embed(
                 ctx, "Model Not Found",
@@ -108,8 +113,9 @@ class Ollama(config.RevnobotCog):
             self, ctx: bridge.Context, *, prompt: BridgeOption(str, "Prompt to send to llama"),
             model: BridgeOption(
                 str, "The llama model to use",
-                default="11B", choices=["11B", "90B"]
-            ) = "11B",
+                default=config.current_profile['commands']['ask-llama-vision']['default'],
+                choices=config.current_profile['commands']['ask-llama-vision']['options'].keys()
+            ) = config.current_profile['commands']['ask-llama-vision']['default'],
             image: BridgeOption(
                 discord.Attachment, "The image to show the model", required=False
             ) = None
@@ -141,12 +147,13 @@ class Ollama(config.RevnobotCog):
             return
         available_models = [model.model for model in (await self.ollama_client.list()).models]
 
-        if prompt.split()[0].upper() in ['11B', '90B']:
+        if prompt.split()[0].upper() in config.current_profile['commands'][
+            ctx.command.qualified_name
+        ]['options'].keys():
             model = prompt.split()[0].upper()
-        model_id = {
-            "11B": config.current_profile['llama3.2-vision-11b'],
-            "90B": config.current_profile['llama3.2-vision-90b']
-        }[model]
+        model_id = config.current_profile['available'][
+            config.current_profile['commands'][ctx.command.qualified_name]['options'][model]
+        ]
         if model_id not in available_models:
             await ctx.respond(embed=utils.default_embed(
                 ctx, "Model Not Found",
@@ -201,8 +208,9 @@ class Ollama(config.RevnobotCog):
             self, ctx: bridge.Context, *, prompt: BridgeOption(str, "Prompt to send to llama"),
             model: BridgeOption(
                 str, "The llama model to use",
-                default="3B", choices=["1B", "3B"]
-            ) = "3B",
+                default=config.current_profile['commands']['llama-text']['default'],
+                choices=config.current_profile['commands']['llama-text']['options'].keys()
+            ) = config.current_profile['commands']['llama-text']['default'],
     ):
         """About the bot?"""
         await ctx.defer()
@@ -223,12 +231,13 @@ class Ollama(config.RevnobotCog):
             ))
             return
         available_models = [model.model for model in (await self.ollama_client.list()).models]
-        if prompt.split()[0].upper() in ['1B', '3B']:
+        if prompt.split()[0].upper() in config.current_profile['commands'][
+            ctx.command.qualified_name
+        ]['options'].keys():
             model = prompt.split()[0].upper()
-        model_id = {
-            "1B": config.current_profile['llama3.2-text-1b'],
-            "3B": config.current_profile['llama3.2-text-3b']
-        }[model]
+        model_id = config.current_profile['available'][
+            config.current_profile['commands'][ctx.command.qualified_name]['options'][model]
+        ]
         if model_id not in available_models:
             await ctx.respond(embed=utils.default_embed(
                 ctx, "Model Not Found",
@@ -311,7 +320,7 @@ class Ollama(config.RevnobotCog):
                     context_bank[ctx.channel.id] = []
                 context_bank[ctx.channel.id].append(message)
                 response = await self.ollama_client.chat(
-                    model=config.current_profile['llama3.3'], messages=context_bank[ctx.channel.id]
+                    model=config.current_profile['available']['llama3.3'], messages=context_bank[ctx.channel.id]
                 )
         except ollama.ResponseError as error:
             await ctx.respond(embed=utils.default_embed(
@@ -378,7 +387,7 @@ class Ollama(config.RevnobotCog):
                     context_bank[ctx.channel.id] = []
                 context_bank[ctx.channel.id].append(message)
                 response = await self.ollama_client.chat(
-                    model=config.current_profile['qwq'], messages=context_bank[ctx.channel.id]
+                    model=config.current_profile['available']['qwq'], messages=context_bank[ctx.channel.id]
                 )
         except ollama.ResponseError as error:
             await ctx.respond(embed=utils.default_embed(
@@ -456,7 +465,7 @@ class Ollama(config.RevnobotCog):
                     context_bank[ctx.channel.id] = []
                 context_bank[ctx.channel.id].append(message)
                 response = await self.ollama_client.chat(
-                    model=config.current_profile['deepseek-r1'], messages=context_bank[ctx.channel.id]
+                    model=config.current_profile['available']['deepseek-r1'], messages=context_bank[ctx.channel.id]
                 )
         except ollama.ResponseError as error:
             await ctx.respond(embed=utils.default_embed(
@@ -542,7 +551,7 @@ class Ollama(config.RevnobotCog):
                     context_bank[ctx.channel.id] = []
                 context_bank[ctx.channel.id].append(message)
                 response = await self.ollama_client.chat(
-                    model=config.current_profile['gemma3'], messages=context_bank[ctx.channel.id]
+                    model=config.current_profile['available']['gemma3'], messages=context_bank[ctx.channel.id]
                 )
         except ollama.ResponseError as error:
             await ctx.respond(embed=utils.default_embed(
