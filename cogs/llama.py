@@ -464,13 +464,14 @@ class Ollama(config.RevnobotCog):
                 embed=utils.default_embed(ctx, "QwQ Response", f"{response_content}")
             )
         else:
+            max_length = 4093 if thinking_part else 4096
             embed_pages = []
             response_pages = [
-                response_content[x:x + 4096] for x in range(0, len(response_content), 4096)
+                response_content[x:x + max_length] for x in range(0, len(response_content), max_length)
             ]
             for index, response_page in enumerate(response_pages):
                 part_of_thinking = (
-                    thinking_part and index and 4096 * index < len(thinking_part)
+                        thinking_part and index and max_length * index < len(thinking_part)
                 )
                 embed_pages.append(
                     utils.default_embed(
@@ -562,13 +563,14 @@ class Ollama(config.RevnobotCog):
                 embed=utils.default_embed(ctx, "Deepseek-R1 Response", f"{response_content}")
             )
         else:
+            max_length = 4093 if thinking_part else 4096
             embed_pages = []
             response_pages = [
-                response_content[x:x + 4096] for x in range(0, len(response_content), 4096)
+                response_content[x:x + max_length] for x in range(0, len(response_content), max_length)
             ]
             for index, response_page in enumerate(response_pages):
                 part_of_thinking = (
-                    thinking_part and index and 4096 * index < len(thinking_part)
+                        thinking_part and index and max_length * index < len(thinking_part)
                 )
                 embed_pages.append(
                     utils.default_embed(
@@ -849,13 +851,14 @@ class Ollama(config.RevnobotCog):
                 embed=utils.default_embed(ctx, "Qwen 3 Response", f"{response_content}")
             )
         else:
+            max_length = 4093 if thinking_part else 4096
             embed_pages = []
             response_pages = [
-                response_content[x:x + 4096] for x in range(0, len(response_content), 4096)
+                response_content[x:x + max_length] for x in range(0, len(response_content), max_length)
             ]
             for index, response_page in enumerate(response_pages):
                 part_of_thinking = (
-                    thinking_part and index and 4096 * index < len(thinking_part)
+                        thinking_part and index and max_length * index < len(thinking_part)
                 )
                 embed_pages.append(
                     utils.default_embed(
