@@ -34,6 +34,11 @@
       "enabled": true,
       "options": {"4B": "gemma3"},
       "default": "4B"
+    },
+    "ask-llama4": {
+      "enabled": true,
+      "options": {"Scout-q4_K_M": "llama4-scout-q4_K_M", "Scout-q8_0": "llama4-scout-q8_0"},
+      "default": "Scout-q4_K_M"
     }
   },
   "available": {
@@ -46,6 +51,8 @@
     "llama3.3": "llama3.3:70b",
     "qwq": "qwq:32b",
     "deepseek-r1": "deepseek-r1:8b",
-    "gemma3": "gemma3:4b"
+    "gemma3": "gemma3:4b",
+    "llama4-scout-q4_K_M": "llama4:17b-scout-16e-instruct-q4_K_M",
+    "llama4-scout-q8_0": "llama4:17b-scout-16e-instruct-q8_0"
   }
 }

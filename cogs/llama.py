@@ -586,6 +586,101 @@ class Ollama(config.RevnobotCog):
                 )
             )
 
+    # noinspection SpellCheckingInspection,PyTypeHints
+    @bridge.bridge_command(
+        name='ask-llama4',
+        description="Ask the llama4 llm",
+        integration_types={discord.IntegrationType.guild_install, discord.IntegrationType.user_install}
+    )
+    @commands.cooldown(**config.default_cooldown_options)
+    async def ask_llama4_cmd(
+            self, ctx: bridge.Context, *, prompt: BridgeOption(str, "Prompt to send to llama4"),
+            model: BridgeOption(
+                str, "The llama4 model to use",
+                default=config.current_profile['commands']['ask-llama4']['default'],
+                choices=config.current_profile['commands']['ask-llama4']['options'].keys()
+            ) = config.current_profile['commands']['ask-llama4']['default'],
+            image: BridgeOption(
+                discord.Attachment, "The image to show the model", required=False
+            ) = None
+    ):
+        """About the bot?"""
+        await ctx.defer()
+        images = []
+        if (ctx.message and len(ctx.message.attachments) > 0) or image:
+            image_bytes = await (
+                ctx.message.attachments[0] if ctx.message and len(ctx.message.attachments) > 0
+                else image
+            ).read()
+            images.append(image_bytes)
+        try:
+            await self.ollama_client.ps()
+        except (httpx.ConnectError, httpx.TimeoutException, ConnectionError):
+            app = await ctx.bot.application_info()
+            await ctx.respond(embed=utils.default_embed(
+                ctx, "Cannot Connect to Ollama Server.",
+                "Unable to connect to ollama server as it is probably not running. "
+                f"Please ask {app.owner.mention} to start the ollama server."
+            ))
+            return
+        except httpx.HTTPError as error:
+            await ctx.respond(embed=utils.default_embed(
+                ctx, "Error Connecting to Ollama Server.",
+                f"There was a problem trying to connect to the ollama server: {error}"
+            ))
+            return
+        available_models = [model.model for model in (await self.ollama_client.list()).models]
+
+        if prompt.split()[0].upper() in config.current_profile['commands'][
+            ctx.command.qualified_name
+        ]['options'].keys():
+            model = prompt.split()[0].upper()
+        model_id = config.current_profile['available'][
+            config.current_profile['commands'][ctx.command.qualified_name]['options'][model]
+        ]
+        if model_id not in available_models:
+            await ctx.respond(embed=utils.default_embed(
+                ctx, "Model Not Found",
+                f"The model ``{model}`` is not available. "
+            ))
+            return
+        try:
+            async with ctx.typing() if not isinstance(ctx, discord.ApplicationContext) else nullcontext():
+                message = {
+                    'role': 'user',
+                    'content': prompt,
+                    'images': images,
+                    'system': 'your response will be sent over discord, so please make sure your entire '
+                              'response is limited to 4096 characters'
+                }
+                if ctx.channel.id not in context_bank:
+                    context_bank[ctx.channel.id] = []
+                context_bank[ctx.channel.id].append(message)
+                response = await self.ollama_client.chat(
+                    model=model_id, messages=context_bank[ctx.channel.id]
+                )
+        except ollama.ResponseError as error:
+            await ctx.respond(embed=utils.default_embed(
+                ctx, "Error Genrating Response",
+                f"{error.error}"
+            ))
+            return
+        context_bank[ctx.channel.id].append({'role': 'assistant', 'content': response.message.content})
+        if len(response.message.content) <= 2000:
+            await ctx.respond(f"{response.message.content}")
+        elif len(response.message.content) <= 4096:
+            await ctx.respond(
+                embed=utils.default_embed(ctx, "Llama Response", f"{response.message.content}")
+            )
+        else:
+            await ctx.respond(
+                embed=utils.default_embed(
+                    ctx, "Response Too large",
+                    f"Llama sent a response longer that the maximum amount of characters allowed on discord (4096). "
+                    f"Please tell llama to limit the response to 4096 characters."
+                )
+            )
+
 
 def setup(client):
     client.add_cog(Ollama(client))
