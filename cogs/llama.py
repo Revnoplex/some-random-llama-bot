@@ -1,4 +1,5 @@
 from contextlib import nullcontext
+from typing import Union
 import discord
 import httpx
 import ollama
@@ -18,6 +19,13 @@ class Ollama(config.RevnobotCog):
         self.icon = "\U0001f999"
         self.hidden = False
         self.ollama_client = ollama.AsyncClient(config.ollama_server)
+
+    @staticmethod
+    async def cog_check(ctx: Union[discord.ApplicationContext, commands.Context]) -> bool:
+        check = config.current_profile["commands"][ctx.command.qualified_name]["enabled"]
+        if not check:
+            raise commands.DisabledCommand('This LLM is disabled in the current configuration')
+        return True
 
     # noinspection SpellCheckingInspection,PyTypeHints
     @bridge.bridge_command(
