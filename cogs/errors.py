@@ -612,7 +612,15 @@ class Errors(config.RevnobotCog):
                     await ctx.channel.send(embed=cooldown_embed)
             else:
                 await ctx.send(embed=cooldown_embed)
-
+        elif isinstance(error, commands.DisabledCommand):
+            embed = utils.warning_embed(ctx.bot, "Command Disabled", f'{error}')
+            if isinstance(ctx, discord.ApplicationContext):
+                try:
+                    await ctx.respond(embed=embed, ephemeral=True)
+                except discord.NotFound:
+                    await ctx.channel.send(embed=embed)
+            else:
+                await ctx.send(embed=embed)
         elif not isinstance(error, (commands.CommandInvokeError, discord.ApplicationCommandInvokeError,
                                     commands.ConversionError)):
             embed = utils.warning_embed(ctx.bot, f'Unknown Error',
