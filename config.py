@@ -90,7 +90,7 @@ if not os.path.isfile('./json/server-profiles.json'):
     print("Warning: json/server-profiles.json file not found. Created server-profiles.json using default template")
 
 with open('./json/server-profiles.json') as r_server_profiles:
-    server_profiles = json.load(r_server_profiles)
+    server_profiles: dict = json.load(r_server_profiles)
 
 if ollama_server not in server_profiles:
     server_profiles[ollama_server] = profile_template
@@ -98,7 +98,7 @@ if ollama_server not in server_profiles:
         json.dump(server_profiles, w_server_profiles, indent=2)
     print(f"Created new profile for {ollama_server} from template")
 
-current_profile = server_profiles[ollama_server]
+current_profile: dict = server_profiles[ollama_server]
 
 ascii_colour = "\033[0m"
 version_int = 0
