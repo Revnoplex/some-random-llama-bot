@@ -352,7 +352,10 @@ class Ollama(config.RevnobotCog):
                     context_bank[ctx.channel.id] = []
                 context_bank[ctx.channel.id].append(message)
                 response = await self.ollama_client.chat(
-                    model=config.current_profile['available']['llama3.3'], messages=context_bank[ctx.channel.id]
+                    model=config.current_profile['available'][
+                        next(iter(config.current_profile['commands'][ctx.command.qualified_name]['options'].values()))
+                    ],
+                    messages=context_bank[ctx.channel.id]
                 )
         except ollama.ResponseError as error:
             await ctx.respond(embed=utils.default_embed(
@@ -427,7 +430,10 @@ class Ollama(config.RevnobotCog):
                     context_bank[ctx.channel.id] = []
                 context_bank[ctx.channel.id].append(message)
                 response = await self.ollama_client.chat(
-                    model=config.current_profile['available']['qwq'], messages=context_bank[ctx.channel.id]
+                    model=config.current_profile['available'][
+                        next(iter(config.current_profile['commands'][ctx.command.qualified_name]['options'].values()))
+                    ],
+                    messages=context_bank[ctx.channel.id]
                 )
         except ollama.ResponseError as error:
             await ctx.respond(embed=utils.default_embed(
@@ -513,7 +519,10 @@ class Ollama(config.RevnobotCog):
                     context_bank[ctx.channel.id] = []
                 context_bank[ctx.channel.id].append(message)
                 response = await self.ollama_client.chat(
-                    model=config.current_profile['available']['deepseek-r1'], messages=context_bank[ctx.channel.id],
+                    model=config.current_profile['available'][
+                        next(iter(config.current_profile['commands'][ctx.command.qualified_name]['options'].values()))
+                    ],
+                    messages=context_bank[ctx.channel.id],
                     think=enable_thinking
                 )
         except ollama.ResponseError as error:
@@ -612,7 +621,10 @@ class Ollama(config.RevnobotCog):
                     context_bank[ctx.channel.id] = []
                 context_bank[ctx.channel.id].append(message)
                 response = await self.ollama_client.chat(
-                    model=config.current_profile['available']['gemma3'], messages=context_bank[ctx.channel.id]
+                    model=config.current_profile['available'][
+                        next(iter(config.current_profile['commands'][ctx.command.qualified_name]['options'].values()))
+                    ],
+                    messages=context_bank[ctx.channel.id]
                 )
         except ollama.ResponseError as error:
             await ctx.respond(embed=utils.default_embed(
@@ -789,7 +801,10 @@ class Ollama(config.RevnobotCog):
                     context_bank[ctx.channel.id] = []
                 context_bank[ctx.channel.id].append(message)
                 response = await self.ollama_client.chat(
-                    model=config.current_profile['available']['qwen3'], messages=context_bank[ctx.channel.id],
+                    model=config.current_profile['available'][
+                        next(iter(config.current_profile['commands'][ctx.command.qualified_name]['options'].values()))
+                    ],
+                    messages=context_bank[ctx.channel.id],
                     think=enable_thinking
                 )
         except ollama.ResponseError as error:
