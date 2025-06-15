@@ -44,6 +44,11 @@
       "enabled": true,
       "options": {"8B": "qwen3"},
       "default": "8B"
+    },
+    "ask-magistral": {
+      "enabled": true,
+      "options": {"24B": "magistral"},
+      "default": "24B"
     }
   },
   "available": {
@@ -59,6 +64,7 @@
     "gemma3": "gemma3:4b",
     "llama4-scout-q4_K_M": "llama4:17b-scout-16e-instruct-q4_K_M",
     "llama4-scout-q8_0": "llama4:17b-scout-16e-instruct-q8_0",
-    "qwen3": "qwen3:8b"
+    "qwen3": "qwen3:8b",
+    "magistral": "magistral:24b"
   }
 }

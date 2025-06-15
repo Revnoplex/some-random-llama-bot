@@ -444,16 +444,17 @@ class Ollama(config.RevnobotCog):
             ))
             return
         context_bank[ctx.channel.id].append({'role': 'assistant', 'content': response.message.content})
+        thinking_part = None
         if show_thinking:
-            response_content = (
-                    "-# **Thinking**...\n-# " +
-                    response.message.content.split("\n</think>")[0].replace("<think>\n\n", "").replace(
-                        "<think>\n", ""
-                    ).replace(
-                        "\n", "\n-# "
-                    ).replace("\n-# \n", "\n-# ** **\n").rsplit("-# ", 1)[0]
-                    + "\n" + response.message.content.split("</think>\n\n")[-1]
+            thinking_part = (
+                "-# **Thinking**...\n-# " +
+                response.message.content.split("\n</think>")[0].replace("<think>\n\n", "").replace(
+                    "<think>\n", ""
+                ).replace(
+                    "\n", "\n-# "
+                ).replace("\n-# \n", "\n-# ** **\n").rsplit("-# ", 1)[0]
             )
+            response_content = thinking_part + "\n" + response.message.content.split("</think>\n\n")[-1]
         else:
             response_content = response.message.content.split("</think>\n\n")[-1]
         if len(response_content) <= 2000:
@@ -468,9 +469,13 @@ class Ollama(config.RevnobotCog):
                 response_content[x:x + 4096] for x in range(0, len(response_content), 4096)
             ]
             for index, response_page in enumerate(response_pages):
+                part_of_thinking = (
+                    thinking_part and index and 4096 * index < len(thinking_part)
+                )
                 embed_pages.append(
                     utils.default_embed(
-                        ctx, f"QwQ Response {index + 1}/{len(response_pages)}", f"{response_page}"
+                        ctx, f"QwQ Response {index + 1}/{len(response_pages)}",
+                        f"-# {response_page}" if part_of_thinking else f"{response_page}"
                     )
                 )
             paginator = pages.Paginator(pages=embed_pages)
@@ -534,14 +539,15 @@ class Ollama(config.RevnobotCog):
             ))
             return
         context_bank[ctx.channel.id].append({'role': 'assistant', 'content': response.message.content})
+        thinking_part = None
         if response.message.thinking:
-            response_content = (
-                    "-# **Thinking**...\n-# " +
-                    response.message.thinking.replace(
-                        "\n", "\n-# "
-                    ).replace("\n-# \n", "\n-# ** **\n").rsplit("-# ", 1)[0]
-                    + "\n" + response.message.content
+            thinking_part = (
+                "-# **Thinking**...\n-# " +
+                response.message.thinking.replace(
+                    "\n", "\n-# "
+                ).replace("\n-# \n", "\n-# ** **\n").rsplit("-# ", 1)[0]
             )
+            response_content = thinking_part + "\n" + response.message.content
         elif enable_thinking and not response.message.thinking:
             response_content = (
                     ":warning: **WARNING**: thinking associated with the response is missing\n\n"
@@ -561,9 +567,13 @@ class Ollama(config.RevnobotCog):
                 response_content[x:x + 4096] for x in range(0, len(response_content), 4096)
             ]
             for index, response_page in enumerate(response_pages):
+                part_of_thinking = (
+                    thinking_part and index and 4096 * index < len(thinking_part)
+                )
                 embed_pages.append(
                     utils.default_embed(
-                        ctx, f"Deepseek-R1 Response {index + 1}/{len(response_pages)}", f"{response_page}"
+                        ctx, f"Deepseek-R1 Response {index + 1}/{len(response_pages)}",
+                        f"-# {response_page}" if part_of_thinking else f"{response_page}"
                     )
                 )
             paginator = pages.Paginator(pages=embed_pages)
@@ -816,14 +826,15 @@ class Ollama(config.RevnobotCog):
             ))
             return
         context_bank[ctx.channel.id].append({'role': 'assistant', 'content': response.message.content})
+        thinking_part = None
         if response.message.thinking:
-            response_content = (
+            thinking_part = (
                     "-# **Thinking**...\n-# " +
                     response.message.thinking.replace(
                         "\n", "\n-# "
                     ).replace("\n-# \n", "\n-# ** **\n").rsplit("-# ", 1)[0]
-                    + "\n" + response.message.content
             )
+            response_content = thinking_part + "\n" + response.message.content
         elif enable_thinking and not response.message.thinking:
             response_content = (
                     ":warning: **WARNING**: thinking associated with the response is missing\n\n"
@@ -843,9 +854,113 @@ class Ollama(config.RevnobotCog):
                 response_content[x:x + 4096] for x in range(0, len(response_content), 4096)
             ]
             for index, response_page in enumerate(response_pages):
+                part_of_thinking = (
+                    thinking_part and index and 4096 * index < len(thinking_part)
+                )
                 embed_pages.append(
                     utils.default_embed(
-                        ctx, f"Qwen 3 Response {index + 1}/{len(response_pages)}", f"{response_page}"
+                        ctx, f"Qwen 3 Response {index + 1}/{len(response_pages)}",
+                        f"-# {response_page}" if part_of_thinking else f"{response_page}"
+                    )
+                )
+            paginator = pages.Paginator(pages=embed_pages)
+            if isinstance(ctx, discord.ApplicationContext):
+                await paginator.respond(ctx.interaction)
+            else:
+                await paginator.send(ctx)
+
+    # noinspection SpellCheckingInspection,PyTypeHints
+    @bridge.bridge_command(
+        name='ask-magistral',
+        description="Ask the magistral llm",
+        integration_types={discord.IntegrationType.guild_install, discord.IntegrationType.user_install}
+    )
+    @commands.cooldown(**config.default_cooldown_options)
+    async def ask_magistral_cmd(
+            self, ctx: bridge.Context, *, prompt: BridgeOption(str, "Prompt to send to magistral"),
+            enable_thinking: BridgeOption(
+                bool, "Enable the LLM to output thinking", default=True, name="enable-thinking"
+            ) = True
+    ):
+        await ctx.defer()
+        try:
+            await self.ollama_client.ps()
+        except (httpx.ConnectError, httpx.TimeoutException, ConnectionError):
+            app = await ctx.bot.application_info()
+            await ctx.respond(embed=utils.default_embed(
+                ctx, "Cannot Connect to Ollama Server.",
+                "Unable to connect to ollama server as it is probably not running. "
+                f"Please ask {app.owner.mention} to start the ollama server."
+            ))
+            return
+        except httpx.HTTPError as error:
+            await ctx.respond(embed=utils.default_embed(
+                ctx, "Error Connecting to Ollama Server.",
+                f"There was a problem trying to connect to the ollama server: {error}"
+            ))
+            return
+        try:
+            async with ctx.typing() if not isinstance(ctx, discord.ApplicationContext) else nullcontext():
+                message = {
+                    'role': 'user',
+                    'content': prompt,
+                    'system': 'your response will be sent over discord, so please make sure your entire '
+                              'response is limited to 4096 characters'
+                }
+                if ctx.channel.id not in context_bank:
+                    context_bank[ctx.channel.id] = []
+                context_bank[ctx.channel.id].append(message)
+                response = await self.ollama_client.chat(
+                    model=config.current_profile['available'][
+                        next(iter(
+                            config.current_profile['commands'][ctx.command.qualified_name]['options'].values()))
+                    ],
+                    messages=context_bank[ctx.channel.id],
+                    think=enable_thinking
+                )
+        except ollama.ResponseError as error:
+            await ctx.respond(embed=utils.default_embed(
+                ctx, "Error Genrating Response",
+                f"{error.error}"
+            ))
+            return
+        context_bank[ctx.channel.id].append({'role': 'assistant', 'content': response.message.content})
+        thinking_part = None
+        if response.message.thinking:
+            thinking_part = (
+                    "-# **Thinking**...\n-# " +
+                    response.message.thinking.replace(
+                        "\n", "\n-# "
+                    ).replace("\n-# \n", "\n-# ** **\n").rsplit("-# ", 1)[0]
+            )
+            response_content = thinking_part + "\n" + response.message.content
+        elif enable_thinking and not response.message.thinking:
+            response_content = (
+                    ":warning: **WARNING**: thinking associated with the response is missing\n\n"
+                    + response.message.content
+            )
+        else:
+            response_content = response.message.content
+        if len(response_content) <= 2000:
+            await ctx.respond(f"{response_content}")
+        elif len(response_content) <= 4096:
+            await ctx.respond(
+                embed=utils.default_embed(ctx, "Magistral Response", f"{response_content}")
+            )
+        else:
+            max_length = 4093 if thinking_part else 4096
+            embed_pages = []
+            response_pages = [
+                response_content[x:x + max_length] for x in range(0, len(response_content), max_length)
+            ]
+            for index, response_page in enumerate(response_pages):
+                part_of_thinking = (
+                    thinking_part and index and max_length * index < len(thinking_part)
+                )
+                embed_pages.append(
+                    utils.default_embed(
+                        ctx, f"Magistral Response {index + 1}/{len(response_pages)}",
+                        f"-# {response_page}" if part_of_thinking else f"{response_page}"
                     )
                 )
             paginator = pages.Paginator(pages=embed_pages)
