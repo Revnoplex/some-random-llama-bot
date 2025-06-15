@@ -3,7 +3,7 @@ from typing import Union
 import discord
 import httpx
 import ollama
-from discord.ext import commands, bridge
+from discord.ext import commands, bridge, pages
 from discord.ext.bridge import BridgeOption
 import config
 import utils
@@ -102,13 +102,21 @@ class Ollama(config.RevnobotCog):
                 embed=utils.default_embed(ctx, "Llama Response", f"{response.message.content}")
             )
         else:
-            await ctx.respond(
-                embed=utils.default_embed(
-                    ctx, "Response Too large",
-                    f"Llama sent a response longer that the maximum amount of characters allowed on discord (4096). "
-                    f"Please tell llama to limit the response to 4096 characters."
+            embed_pages = []
+            response_pages = [
+                response.message.content[x:x + 4096] for x in range(0, len(response.message.content), 4096)
+            ]
+            for index, response_page in enumerate(response_pages):
+                embed_pages.append(
+                    utils.default_embed(
+                        ctx, f"Llama Response {index+1}/{len(response_pages)}", f"{response_page}"
+                    )
                 )
-            )
+            paginator = pages.Paginator(pages=embed_pages)
+            if isinstance(ctx, discord.ApplicationContext):
+                await paginator.respond(ctx.interaction)
+            else:
+                await paginator.send(ctx)
 
     # noinspection SpellCheckingInspection,PyTypeHints
     @bridge.bridge_command(
@@ -197,13 +205,21 @@ class Ollama(config.RevnobotCog):
                 embed=utils.default_embed(ctx, "Llama Response", f"{response.message.content}")
             )
         else:
-            await ctx.respond(
-                embed=utils.default_embed(
-                    ctx, "Response Too large",
-                    f"Llama sent a response longer that the maximum amount of characters allowed on discord (4096). "
-                    f"Please tell llama to limit the response to 4096 characters."
+            embed_pages = []
+            response_pages = [
+                response.message.content[x:x + 4096] for x in range(0, len(response.message.content), 4096)
+            ]
+            for index, response_page in enumerate(response_pages):
+                embed_pages.append(
+                    utils.default_embed(
+                        ctx, f"Llama Response {index + 1}/{len(response_pages)}", f"{response_page}"
+                    )
                 )
-            )
+            paginator = pages.Paginator(pages=embed_pages)
+            if isinstance(ctx, discord.ApplicationContext):
+                await paginator.respond(ctx.interaction)
+            else:
+                await paginator.send(ctx)
 
     # noinspection SpellCheckingInspection,PyTypeHints
     @bridge.bridge_command(
@@ -280,13 +296,21 @@ class Ollama(config.RevnobotCog):
                 embed=utils.default_embed(ctx, "Llama Response", f"{response.message.content}")
             )
         else:
-            await ctx.respond(
-                embed=utils.default_embed(
-                    ctx, "Response Too large",
-                    f"Llama sent a response longer that the maximum amount of characters allowed on discord (4096). "
-                    f"Please tell llama to limit the response to 4096 characters."
+            embed_pages = []
+            response_pages = [
+                response.message.content[x:x + 4096] for x in range(0, len(response.message.content), 4096)
+            ]
+            for index, response_page in enumerate(response_pages):
+                embed_pages.append(
+                    utils.default_embed(
+                        ctx, f"Llama Response {index + 1}/{len(response_pages)}", f"{response_page}"
+                    )
                 )
-            )
+            paginator = pages.Paginator(pages=embed_pages)
+            if isinstance(ctx, discord.ApplicationContext):
+                await paginator.respond(ctx.interaction)
+            else:
+                await paginator.send(ctx)
 
     # noinspection SpellCheckingInspection,PyTypeHints
     @bridge.bridge_command(
@@ -344,13 +368,21 @@ class Ollama(config.RevnobotCog):
                 embed=utils.default_embed(ctx, "Llama 3.3 Response", f"{response.message.content}")
             )
         else:
-            await ctx.respond(
-                embed=utils.default_embed(
-                    ctx, "Response Too large",
-                    f"Llama sent a response longer that the maximum amount of characters allowed on discord (4096). "
-                    f"Please tell llama to limit the response to 4096 characters."
+            embed_pages = []
+            response_pages = [
+                response.message.content[x:x + 4096] for x in range(0, len(response.message.content), 4096)
+            ]
+            for index, response_page in enumerate(response_pages):
+                embed_pages.append(
+                    utils.default_embed(
+                        ctx, f"Llama 3.3 Response {index + 1}/{len(response_pages)}", f"{response_page}"
+                    )
                 )
-            )
+            paginator = pages.Paginator(pages=embed_pages)
+            if isinstance(ctx, discord.ApplicationContext):
+                await paginator.respond(ctx.interaction)
+            else:
+                await paginator.send(ctx)
 
     # noinspection SpellCheckingInspection,PyTypeHints
     @bridge.bridge_command(
@@ -421,23 +453,31 @@ class Ollama(config.RevnobotCog):
                 embed=utils.default_embed(ctx, "QwQ Response", f"{response_content}")
             )
         else:
-            await ctx.respond(
-                embed=utils.default_embed(
-                    ctx, "Response Too large",
-                    f"QwQ sent a response longer that the maximum amount of characters allowed on discord (4096). "
-                    f"Try setting show-thinking to False"
+            embed_pages = []
+            response_pages = [
+                response_content[x:x + 4096] for x in range(0, len(response_content), 4096)
+            ]
+            for index, response_page in enumerate(response_pages):
+                embed_pages.append(
+                    utils.default_embed(
+                        ctx, f"QwQ Response {index + 1}/{len(response_pages)}", f"{response_page}"
+                    )
                 )
-            )
+            paginator = pages.Paginator(pages=embed_pages)
+            if isinstance(ctx, discord.ApplicationContext):
+                await paginator.respond(ctx.interaction)
+            else:
+                await paginator.send(ctx)
 
     # noinspection SpellCheckingInspection,PyTypeHints
     @bridge.bridge_command(
-        name='ask-deekseek',
-        description="Ask the deekseek-r1 llm",
+        name='ask-deepseek',
+        description="Ask the deepseek-r1 llm",
         integration_types={discord.IntegrationType.guild_install, discord.IntegrationType.user_install}
     )
     @commands.cooldown(**config.default_cooldown_options)
-    async def ask_deekseek_cmd(
-            self, ctx: bridge.Context, *, prompt: BridgeOption(str, "Prompt to send to deekseek"),
+    async def ask_deepseek_cmd(
+            self, ctx: bridge.Context, *, prompt: BridgeOption(str, "Prompt to send to deepseek"),
             enable_thinking: BridgeOption(
                 bool, "Enable the LLM to output thinking", default=True, name="enable-thinking"
             ) = True
@@ -500,16 +540,24 @@ class Ollama(config.RevnobotCog):
             await ctx.respond(f"{response_content}")
         elif len(response_content) <= 4096:
             await ctx.respond(
-                embed=utils.default_embed(ctx, "Deekseek-R1 Response", f"{response_content}")
+                embed=utils.default_embed(ctx, "Deepseek-R1 Response", f"{response_content}")
             )
         else:
-            await ctx.respond(
-                embed=utils.default_embed(
-                    ctx, "Response Too large",
-                    f"Deekseek-R1 sent a response longer that the maximum amount of characters allowed on "
-                    f"discord (4096). Try disabling thinking."
+            embed_pages = []
+            response_pages = [
+                response_content[x:x + 4096] for x in range(0, len(response_content), 4096)
+            ]
+            for index, response_page in enumerate(response_pages):
+                embed_pages.append(
+                    utils.default_embed(
+                        ctx, f"Deepseek-R1 Response {index + 1}/{len(response_pages)}", f"{response_page}"
+                    )
                 )
-            )
+            paginator = pages.Paginator(pages=embed_pages)
+            if isinstance(ctx, discord.ApplicationContext):
+                await paginator.respond(ctx.interaction)
+            else:
+                await paginator.send(ctx)
 
     # noinspection SpellCheckingInspection,PyTypeHints
     @bridge.bridge_command(
@@ -578,13 +626,21 @@ class Ollama(config.RevnobotCog):
                 embed=utils.default_embed(ctx, "Gemma 3 Response", f"{response.message.content}")
             )
         else:
-            await ctx.respond(
-                embed=utils.default_embed(
-                    ctx, "Response Too large",
-                    f"Gemma 3 sent a response longer that the maximum amount of characters allowed on discord "
-                    f"(4096). Please tell gemma3 to limit the response to 4096 characters."
+            embed_pages = []
+            response_pages = [
+                response.message.content[x:x + 4096] for x in range(0, len(response.message.content), 4096)
+            ]
+            for index, response_page in enumerate(response_pages):
+                embed_pages.append(
+                    utils.default_embed(
+                        ctx, f"Gemma 3 Response {index + 1}/{len(response_pages)}", f"{response_page}"
+                    )
                 )
-            )
+            paginator = pages.Paginator(pages=embed_pages)
+            if isinstance(ctx, discord.ApplicationContext):
+                await paginator.respond(ctx.interaction)
+            else:
+                await paginator.send(ctx)
 
     # noinspection SpellCheckingInspection,PyTypeHints
     @bridge.bridge_command(
@@ -670,16 +726,24 @@ class Ollama(config.RevnobotCog):
             await ctx.respond(f"{response.message.content}")
         elif len(response.message.content) <= 4096:
             await ctx.respond(
-                embed=utils.default_embed(ctx, "Llama Response", f"{response.message.content}")
+                embed=utils.default_embed(ctx, "Llama 4 Response", f"{response.message.content}")
             )
         else:
-            await ctx.respond(
-                embed=utils.default_embed(
-                    ctx, "Response Too large",
-                    f"Llama sent a response longer that the maximum amount of characters allowed on discord (4096). "
-                    f"Please tell llama to limit the response to 4096 characters."
+            embed_pages = []
+            response_pages = [
+                response.message.content[x:x + 4096] for x in range(0, len(response.message.content), 4096)
+            ]
+            for index, response_page in enumerate(response_pages):
+                embed_pages.append(
+                    utils.default_embed(
+                        ctx, f"Llama 4 Response {index + 1}/{len(response_pages)}", f"{response_page}"
+                    )
                 )
-            )
+            paginator = pages.Paginator(pages=embed_pages)
+            if isinstance(ctx, discord.ApplicationContext):
+                await paginator.respond(ctx.interaction)
+            else:
+                await paginator.send(ctx)
 
 
 def setup(client):
