@@ -8,7 +8,7 @@ from discord.ext.bridge import BridgeOption
 import config
 import utils
 
-context_bank = {}
+context_bank: dict[int, list] = {}
 
 
 class Ollama(config.RevnobotCog):
@@ -22,6 +22,8 @@ class Ollama(config.RevnobotCog):
 
     @staticmethod
     async def cog_check(ctx: Union[discord.ApplicationContext, commands.Context]) -> bool:
+        if ctx.command.qualified_name in ['clear-context']:
+            return True
         check = config.current_profile["commands"][ctx.command.qualified_name]["enabled"]
         if not check:
             raise commands.DisabledCommand('This LLM is disabled in the current configuration')
@@ -851,6 +853,35 @@ class Ollama(config.RevnobotCog):
                 await paginator.respond(ctx.interaction)
             else:
                 await paginator.send(ctx)
+
+    # noinspection SpellCheckingInspection,PyTypeHints
+    @bridge.bridge_command(
+        name='clear-context',
+        description="Clears the message context from the llms",
+        integration_types={discord.IntegrationType.guild_install, discord.IntegrationType.user_install}
+    )
+    @commands.cooldown(**config.default_cooldown_options)
+    async def clear_context_cmd(
+            self, ctx: bridge.Context,
+            scope: BridgeOption(
+                str, "The scope of context to clear", default="Current Channel", name="scope",
+                choices=["Current Channel", "All"]
+            ) = "Current Channel"
+    ):
+        if scope.lower() == "all":
+            owner_check = await ctx.bot.is_owner(ctx.author)
+            if not owner_check:
+                raise commands.NotOwner()
+            await ctx.defer()
+            context_bank.clear()
+            await ctx.respond("Cleared all session context")
+            return
+        await ctx.defer()
+        if not context_bank.get(ctx.channel.id):
+            await ctx.respond("There was no context to clear in this channel")
+            return
+        context_bank[ctx.channel.id].clear()
+        await ctx.respond("Cleared the context for the current channel")
 
 
 def setup(client):
