@@ -440,9 +440,11 @@ class Ollama(config.RevnobotCog):
             response_content = (
                     "-# **Thinking**...\n-# " +
                     response.message.content.split("\n</think>")[0].replace("<think>\n\n", "").replace(
+                        "<think>\n", ""
+                    ).replace(
                         "\n", "\n-# "
                     ).replace("\n-# \n", "\n-# ** **\n").rsplit("-# ", 1)[0]
-                    + response.message.content.split("</think>\n\n")[-1]
+                    + "\n" + response.message.content.split("</think>\n\n")[-1]
             )
         else:
             response_content = response.message.content.split("</think>\n\n")[-1]
