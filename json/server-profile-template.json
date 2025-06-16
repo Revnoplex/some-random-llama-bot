@@ -42,7 +42,7 @@
     },
     "ask-qwen3": {
       "enabled": true,
-      "options": {"8B": "qwen3"},
+      "options": {"8B": "qwen3-8b", "14B": "qwen3-14b"},
       "default": "8B"
     },
     "ask-magistral": {
@@ -74,7 +74,8 @@
     "gemma3": "gemma3:4b",
     "llama4-scout-q4_K_M": "llama4:17b-scout-16e-instruct-q4_K_M",
     "llama4-scout-q8_0": "llama4:17b-scout-16e-instruct-q8_0",
-    "qwen3": "qwen3:8b",
+    "qwen3-8b": "qwen3:8b",
+    "qwen3-14b": "qwen3-14b",
     "magistral": "magistral:24b",
     "mistral": "mistral:7b",
     "mistral-nemo": "mistral-nemo:12b"
