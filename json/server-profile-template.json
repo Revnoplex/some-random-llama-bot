@@ -49,6 +49,16 @@
       "enabled": true,
       "options": {"24B": "magistral"},
       "default": "24B"
+    },
+    "ask-mistral": {
+      "enabled": true,
+      "options": {"7B": "mistral"},
+      "default": "7B"
+    },
+    "ask-mistral-nemo": {
+      "enabled": true,
+      "options": {"12B": "mistral-nemo"},
+      "default": "12B"
     }
   },
   "available": {
@@ -65,6 +75,8 @@
     "llama4-scout-q4_K_M": "llama4:17b-scout-16e-instruct-q4_K_M",
     "llama4-scout-q8_0": "llama4:17b-scout-16e-instruct-q8_0",
     "qwen3": "qwen3:8b",
-    "magistral": "magistral:24b"
+    "magistral": "magistral:24b",
+    "mistral": "mistral:7b",
+    "mistral-nemo": "mistral-nemo:12b"
   }
 }

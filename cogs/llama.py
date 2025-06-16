@@ -992,6 +992,156 @@ class Ollama(config.RevnobotCog):
 
     # noinspection SpellCheckingInspection,PyTypeHints
     @bridge.bridge_command(
+        name='ask-mistral',
+        description="Ask the mistral llm",
+        integration_types={discord.IntegrationType.guild_install, discord.IntegrationType.user_install}
+    )
+    @commands.cooldown(**config.default_cooldown_options)
+    async def ask_mistral_cmd(
+            self, ctx: bridge.Context, *, prompt: BridgeOption(str, "Prompt to send to mistral"),
+    ):
+        await ctx.defer()
+        try:
+            await self.ollama_client.ps()
+        except (httpx.ConnectError, httpx.TimeoutException, ConnectionError):
+            app = await ctx.bot.application_info()
+            await ctx.respond(embed=utils.default_embed(
+                ctx, "Cannot Connect to Ollama Server.",
+                "Unable to connect to ollama server as it is probably not running. "
+                f"Please ask {app.owner.mention} to start the ollama server."
+            ))
+            return
+        except httpx.HTTPError as error:
+            await ctx.respond(embed=utils.default_embed(
+                ctx, "Error Connecting to Ollama Server.",
+                f"There was a problem trying to connect to the ollama server: {error}"
+            ))
+            return
+        try:
+            async with ctx.typing() if not isinstance(ctx, discord.ApplicationContext) else nullcontext():
+                message = {
+                    'role': 'user',
+                    'content': prompt,
+                    'system': 'your response will be sent over discord, so please make sure your entire '
+                              'response is limited to 4096 characters'
+                }
+                if ctx.channel.id not in context_bank:
+                    context_bank[ctx.channel.id] = []
+                context_bank[ctx.channel.id].append(message)
+                response = await self.ollama_client.chat(
+                    model=config.current_profile['available'][
+                        next(iter(
+                            config.current_profile['commands'][ctx.command.qualified_name]['options'].values()))
+                    ],
+                    messages=context_bank[ctx.channel.id]
+                )
+        except ollama.ResponseError as error:
+            await ctx.respond(embed=utils.default_embed(
+                ctx, "Error Genrating Response",
+                f"{error.error}"
+            ))
+            return
+        context_bank[ctx.channel.id].append({'role': 'assistant', 'content': response.message.content})
+        if len(response.message.content) <= 2000:
+            await ctx.respond(f"{response.message.content}")
+        elif len(response.message.content) <= 4096:
+            await ctx.respond(
+                embed=utils.default_embed(ctx, "Mistral Response", f"{response.message.content}")
+            )
+        else:
+            embed_pages = []
+            response_pages = [
+                response.message.content[x:x + 4096] for x in range(0, len(response.message.content), 4096)
+            ]
+            for index, response_page in enumerate(response_pages):
+                embed_pages.append(
+                    utils.default_embed(
+                        ctx, f"Mistral Response {index + 1}/{len(response_pages)}", f"{response_page}"
+                    )
+                )
+            paginator = pages.Paginator(pages=embed_pages)
+            if isinstance(ctx, discord.ApplicationContext):
+                await paginator.respond(ctx.interaction)
+            else:
+                await paginator.send(ctx)
+
+    # noinspection SpellCheckingInspection,PyTypeHints
+    @bridge.bridge_command(
+        name='ask-mistral-nemo',
+        description="Ask the mistral nemo llm",
+        integration_types={discord.IntegrationType.guild_install, discord.IntegrationType.user_install}
+    )
+    @commands.cooldown(**config.default_cooldown_options)
+    async def ask_mistral_nemo_cmd(
+            self, ctx: bridge.Context, *, prompt: BridgeOption(str, "Prompt to send to mistral nemo"),
+    ):
+        await ctx.defer()
+        try:
+            await self.ollama_client.ps()
+        except (httpx.ConnectError, httpx.TimeoutException, ConnectionError):
+            app = await ctx.bot.application_info()
+            await ctx.respond(embed=utils.default_embed(
+                ctx, "Cannot Connect to Ollama Server.",
+                "Unable to connect to ollama server as it is probably not running. "
+                f"Please ask {app.owner.mention} to start the ollama server."
+            ))
+            return
+        except httpx.HTTPError as error:
+            await ctx.respond(embed=utils.default_embed(
+                ctx, "Error Connecting to Ollama Server.",
+                f"There was a problem trying to connect to the ollama server: {error}"
+            ))
+            return
+        try:
+            async with ctx.typing() if not isinstance(ctx, discord.ApplicationContext) else nullcontext():
+                message = {
+                    'role': 'user',
+                    'content': prompt,
+                    'system': 'your response will be sent over discord, so please make sure your entire '
+                              'response is limited to 4096 characters'
+                }
+                if ctx.channel.id not in context_bank:
+                    context_bank[ctx.channel.id] = []
+                context_bank[ctx.channel.id].append(message)
+                response = await self.ollama_client.chat(
+                    model=config.current_profile['available'][
+                        next(iter(
+                            config.current_profile['commands'][ctx.command.qualified_name]['options'].values()))
+                    ],
+                    messages=context_bank[ctx.channel.id]
+                )
+        except ollama.ResponseError as error:
+            await ctx.respond(embed=utils.default_embed(
+                ctx, "Error Genrating Response",
+                f"{error.error}"
+            ))
+            return
+        context_bank[ctx.channel.id].append({'role': 'assistant', 'content': response.message.content})
+        if len(response.message.content) <= 2000:
+            await ctx.respond(f"{response.message.content}")
+        elif len(response.message.content) <= 4096:
+            await ctx.respond(
+                embed=utils.default_embed(ctx, "Mistral NeMo Response", f"{response.message.content}")
+            )
+        else:
+            embed_pages = []
+            response_pages = [
+                response.message.content[x:x + 4096] for x in range(0, len(response.message.content), 4096)
+            ]
+            for index, response_page in enumerate(response_pages):
+                embed_pages.append(
+                    utils.default_embed(
+                        ctx, f"Mistral NeMo Response {index + 1}/{len(response_pages)}", f"{response_page}"
+                    )
+                )
+            paginator = pages.Paginator(pages=embed_pages)
+            if isinstance(ctx, discord.ApplicationContext):
+                await paginator.respond(ctx.interaction)
+            else:
+                await paginator.send(ctx)
+
+    # noinspection SpellCheckingInspection,PyTypeHints
+    @bridge.bridge_command(
         name='clear-context',
         description="Clears the message context from the llms",
         integration_types={discord.IntegrationType.guild_install, discord.IntegrationType.user_install}
