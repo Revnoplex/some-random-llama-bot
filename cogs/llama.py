@@ -782,6 +782,11 @@ class Ollama(config.RevnobotCog):
     @commands.cooldown(**config.default_cooldown_options)
     async def ask_qwen3_cmd(
             self, ctx: bridge.Context, *, prompt: BridgeOption(str, "Prompt to send to qwen3"),
+            model: BridgeOption(
+                str, "The qwen3 model to use",
+                default=config.current_profile['commands']['ask-qwen3']['default'],
+                choices=config.current_profile['commands']['ask-qwen3']['options'].keys()
+            ) = config.current_profile['commands']['ask-qwen3']['default'],
             enable_thinking: BridgeOption(
                 bool, "Enable the LLM to output thinking", default=True, name="enable-thinking"
             ) = True
@@ -803,6 +808,21 @@ class Ollama(config.RevnobotCog):
                 f"There was a problem trying to connect to the ollama server: {error}"
             ))
             return
+        available_models = [model.model for model in (await self.ollama_client.list()).models]
+
+        if prompt.split()[0].upper() in config.current_profile['commands'][
+            ctx.command.qualified_name
+        ]['options'].keys():
+            model = prompt.split()[0].upper()
+        model_id = config.current_profile['available'][
+            config.current_profile['commands'][ctx.command.qualified_name]['options'][model]
+        ]
+        if model_id not in available_models:
+            await ctx.respond(embed=utils.default_embed(
+                ctx, "Model Not Found",
+                f"The model ``{model}`` is not available. "
+            ))
+            return
         try:
             async with ctx.typing() if not isinstance(ctx, discord.ApplicationContext) else nullcontext():
                 message = {
@@ -815,9 +835,7 @@ class Ollama(config.RevnobotCog):
                     context_bank[ctx.channel.id] = []
                 context_bank[ctx.channel.id].append(message)
                 response = await self.ollama_client.chat(
-                    model=config.current_profile['available'][
-                        next(iter(config.current_profile['commands'][ctx.command.qualified_name]['options'].values()))
-                    ],
+                    model=model_id,
                     messages=context_bank[ctx.channel.id],
                     think=enable_thinking
                 )
