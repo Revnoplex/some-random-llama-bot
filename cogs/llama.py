@@ -104,11 +104,28 @@ class Ollama(config.RevnobotCog):
                 embed=utils.default_embed(ctx, "Llama Response", f"{response.message.content}")
             )
         else:
+            language_buffer_size = 16
+            max_length = 4096
+            max_length -= language_buffer_size + 8
             embed_pages = []
             response_pages = [
-                response.message.content[x:x + 4096] for x in range(0, len(response.message.content), 4096)
+                response.message.content[x:x + max_length] for x in range(0, len(response.message.content), max_length)
             ]
+            unfinished_codeblock = ""
+            unfinished_backtick = False
             for index, response_page in enumerate(response_pages):
+                if unfinished_codeblock:
+                    response_page = "```" + unfinished_codeblock + '\n' + response_page
+                    unfinished_codeblock = ""
+                elif unfinished_backtick:
+                    response_page = '`' + response_page
+                    unfinished_backtick = False
+                if response_page.count("```") & 1:
+                    unfinished_codeblock = "c"
+                    response_page += "```"
+                elif response_page.count("`") - 3 * response_page.count("```") & 1:
+                    unfinished_backtick = True
+                    response_page += "`"
                 embed_pages.append(
                     utils.default_embed(
                         ctx, f"Llama Response {index+1}/{len(response_pages)}", f"{response_page}"
@@ -169,6 +186,10 @@ class Ollama(config.RevnobotCog):
             ctx.command.qualified_name
         ]['options'].keys():
             model = prompt.split()[0].upper()
+        print("attempted to use:")
+        print(config.current_profile['commands'][ctx.command.qualified_name]['options'][model])
+        print("but only these keys existied")
+        print(config.current_profile['available'].keys())
         model_id = config.current_profile['available'][
             config.current_profile['commands'][ctx.command.qualified_name]['options'][model]
         ]
@@ -207,11 +228,28 @@ class Ollama(config.RevnobotCog):
                 embed=utils.default_embed(ctx, "Llama Response", f"{response.message.content}")
             )
         else:
+            language_buffer_size = 16
+            max_length = 4096
+            max_length -= language_buffer_size + 8
             embed_pages = []
             response_pages = [
-                response.message.content[x:x + 4096] for x in range(0, len(response.message.content), 4096)
+                response.message.content[x:x + max_length] for x in range(0, len(response.message.content), max_length)
             ]
+            unfinished_codeblock = ""
+            unfinished_backtick = False
             for index, response_page in enumerate(response_pages):
+                if unfinished_codeblock:
+                    response_page = "```" + unfinished_codeblock + '\n' + response_page
+                    unfinished_codeblock = ""
+                elif unfinished_backtick:
+                    response_page = '`' + response_page
+                    unfinished_backtick = False
+                if response_page.count("```") & 1:
+                    unfinished_codeblock = "c"
+                    response_page += "```"
+                elif response_page.count("`") - 3 * response_page.count("```") & 1:
+                    unfinished_backtick = True
+                    response_page += "`"
                 embed_pages.append(
                     utils.default_embed(
                         ctx, f"Llama Response {index + 1}/{len(response_pages)}", f"{response_page}"
@@ -298,11 +336,28 @@ class Ollama(config.RevnobotCog):
                 embed=utils.default_embed(ctx, "Llama Response", f"{response.message.content}")
             )
         else:
+            language_buffer_size = 16
+            max_length = 4096
+            max_length -= language_buffer_size + 8
             embed_pages = []
             response_pages = [
-                response.message.content[x:x + 4096] for x in range(0, len(response.message.content), 4096)
+                response.message.content[x:x + max_length] for x in range(0, len(response.message.content), max_length)
             ]
+            unfinished_codeblock = ""
+            unfinished_backtick = False
             for index, response_page in enumerate(response_pages):
+                if unfinished_codeblock:
+                    response_page = "```" + unfinished_codeblock + '\n' + response_page
+                    unfinished_codeblock = ""
+                elif unfinished_backtick:
+                    response_page = '`' + response_page
+                    unfinished_backtick = False
+                if response_page.count("```") & 1:
+                    unfinished_codeblock = "c"
+                    response_page += "```"
+                elif response_page.count("`") - 3 * response_page.count("```") & 1:
+                    unfinished_backtick = True
+                    response_page += "`"
                 embed_pages.append(
                     utils.default_embed(
                         ctx, f"Llama Response {index + 1}/{len(response_pages)}", f"{response_page}"
@@ -373,11 +428,28 @@ class Ollama(config.RevnobotCog):
                 embed=utils.default_embed(ctx, "Llama 3.3 Response", f"{response.message.content}")
             )
         else:
+            language_buffer_size = 16
+            max_length = 4096
+            max_length -= language_buffer_size + 8
             embed_pages = []
             response_pages = [
-                response.message.content[x:x + 4096] for x in range(0, len(response.message.content), 4096)
+                response.message.content[x:x + max_length] for x in range(0, len(response.message.content), max_length)
             ]
+            unfinished_codeblock = ""
+            unfinished_backtick = False
             for index, response_page in enumerate(response_pages):
+                if unfinished_codeblock:
+                    response_page = "```" + unfinished_codeblock + '\n' + response_page
+                    unfinished_codeblock = ""
+                elif unfinished_backtick:
+                    response_page = '`' + response_page
+                    unfinished_backtick = False
+                if response_page.count("```") & 1:
+                    unfinished_codeblock = "c"
+                    response_page += "```"
+                elif response_page.count("`") - 3 * response_page.count("```") & 1:
+                    unfinished_backtick = True
+                    response_page += "`"
                 embed_pages.append(
                     utils.default_embed(
                         ctx, f"Llama 3.3 Response {index + 1}/{len(response_pages)}", f"{response_page}"
@@ -464,15 +536,31 @@ class Ollama(config.RevnobotCog):
                 embed=utils.default_embed(ctx, "QwQ Response", f"{response_content}")
             )
         else:
+            language_buffer_size = 16
             max_length = 4093 if thinking_part else 4096
+            max_length -= language_buffer_size + 8
             embed_pages = []
             response_pages = [
                 response_content[x:x + max_length] for x in range(0, len(response_content), max_length)
             ]
+            unfinished_codeblock = ""
+            unfinished_backtick = False
             for index, response_page in enumerate(response_pages):
                 part_of_thinking = (
                         thinking_part and index and max_length * index < len(thinking_part)
                 )
+                if unfinished_codeblock:
+                    response_page = "```" + unfinished_codeblock + '\n' + response_page
+                    unfinished_codeblock = ""
+                elif unfinished_backtick:
+                    response_page = '`' + response_page
+                    unfinished_backtick = False
+                if response_page.count("```") & 1:
+                    unfinished_codeblock = "c"
+                    response_page += "```"
+                elif response_page.count("`") - 3 * response_page.count("```") & 1:
+                    unfinished_backtick = True
+                    response_page += "`"
                 embed_pages.append(
                     utils.default_embed(
                         ctx, f"QwQ Response {index + 1}/{len(response_pages)}",
@@ -563,15 +651,31 @@ class Ollama(config.RevnobotCog):
                 embed=utils.default_embed(ctx, "Deepseek-R1 Response", f"{response_content}")
             )
         else:
+            language_buffer_size = 16
             max_length = 4093 if thinking_part else 4096
+            max_length -= language_buffer_size + 8
             embed_pages = []
             response_pages = [
                 response_content[x:x + max_length] for x in range(0, len(response_content), max_length)
             ]
+            unfinished_codeblock = ""
+            unfinished_backtick = False
             for index, response_page in enumerate(response_pages):
                 part_of_thinking = (
                         thinking_part and index and max_length * index < len(thinking_part)
                 )
+                if unfinished_codeblock:
+                    response_page = "```" + unfinished_codeblock + '\n' + response_page
+                    unfinished_codeblock = ""
+                elif unfinished_backtick:
+                    response_page = '`' + response_page
+                    unfinished_backtick = False
+                if response_page.count("```") & 1:
+                    unfinished_codeblock = "c"
+                    response_page += "```"
+                elif response_page.count("`") - 3 * response_page.count("```") & 1:
+                    unfinished_backtick = True
+                    response_page += "`"
                 embed_pages.append(
                     utils.default_embed(
                         ctx, f"Deepseek-R1 Response {index + 1}/{len(response_pages)}",
@@ -654,11 +758,28 @@ class Ollama(config.RevnobotCog):
                 embed=utils.default_embed(ctx, "Gemma 3 Response", f"{response.message.content}")
             )
         else:
+            language_buffer_size = 16
+            max_length = 4096
+            max_length -= language_buffer_size + 8
             embed_pages = []
             response_pages = [
-                response.message.content[x:x + 4096] for x in range(0, len(response.message.content), 4096)
+                response.message.content[x:x + max_length] for x in range(0, len(response.message.content), max_length)
             ]
+            unfinished_codeblock = ""
+            unfinished_backtick = False
             for index, response_page in enumerate(response_pages):
+                if unfinished_codeblock:
+                    response_page = "```" + unfinished_codeblock + '\n' + response_page
+                    unfinished_codeblock = ""
+                elif unfinished_backtick:
+                    response_page = '`' + response_page
+                    unfinished_backtick = False
+                if response_page.count("```") & 1:
+                    unfinished_codeblock = "c"
+                    response_page += "```"
+                elif response_page.count("`") - 3 * response_page.count("```") & 1:
+                    unfinished_backtick = True
+                    response_page += "`"
                 embed_pages.append(
                     utils.default_embed(
                         ctx, f"Gemma 3 Response {index + 1}/{len(response_pages)}", f"{response_page}"
@@ -757,11 +878,28 @@ class Ollama(config.RevnobotCog):
                 embed=utils.default_embed(ctx, "Llama 4 Response", f"{response.message.content}")
             )
         else:
+            language_buffer_size = 16
+            max_length = 4096
+            max_length -= language_buffer_size + 8
             embed_pages = []
             response_pages = [
-                response.message.content[x:x + 4096] for x in range(0, len(response.message.content), 4096)
+                response.message.content[x:x + max_length] for x in range(0, len(response.message.content), max_length)
             ]
+            unfinished_codeblock = ""
+            unfinished_backtick = False
             for index, response_page in enumerate(response_pages):
+                if unfinished_codeblock:
+                    response_page = "```" + unfinished_codeblock + '\n' + response_page
+                    unfinished_codeblock = ""
+                elif unfinished_backtick:
+                    response_page = '`' + response_page
+                    unfinished_backtick = False
+                if response_page.count("```") & 1:
+                    unfinished_codeblock = "c"
+                    response_page += "```"
+                elif response_page.count("`") - 3 * response_page.count("```") & 1:
+                    unfinished_backtick = True
+                    response_page += "`"
                 embed_pages.append(
                     utils.default_embed(
                         ctx, f"Llama 4 Response {index + 1}/{len(response_pages)}", f"{response_page}"
@@ -869,15 +1007,31 @@ class Ollama(config.RevnobotCog):
                 embed=utils.default_embed(ctx, "Qwen 3 Response", f"{response_content}")
             )
         else:
+            language_buffer_size = 16
             max_length = 4093 if thinking_part else 4096
+            max_length -= language_buffer_size + 8
             embed_pages = []
             response_pages = [
                 response_content[x:x + max_length] for x in range(0, len(response_content), max_length)
             ]
+            unfinished_codeblock = ""
+            unfinished_backtick = False
             for index, response_page in enumerate(response_pages):
                 part_of_thinking = (
                         thinking_part and index and max_length * index < len(thinking_part)
                 )
+                if unfinished_codeblock:
+                    response_page = "```" + unfinished_codeblock + '\n' + response_page
+                    unfinished_codeblock = ""
+                elif unfinished_backtick:
+                    response_page = '`' + response_page
+                    unfinished_backtick = False
+                if response_page.count("```") & 1:
+                    unfinished_codeblock = "c"
+                    response_page += "```"
+                elif response_page.count("`") - 3 * response_page.count("```") & 1:
+                    unfinished_backtick = True
+                    response_page += "`"
                 embed_pages.append(
                     utils.default_embed(
                         ctx, f"Qwen 3 Response {index + 1}/{len(response_pages)}",
@@ -969,15 +1123,31 @@ class Ollama(config.RevnobotCog):
                 embed=utils.default_embed(ctx, "Magistral Response", f"{response_content}")
             )
         else:
+            language_buffer_size = 16
             max_length = 4093 if thinking_part else 4096
+            max_length -= language_buffer_size + 8
             embed_pages = []
             response_pages = [
                 response_content[x:x + max_length] for x in range(0, len(response_content), max_length)
             ]
+            unfinished_codeblock = ""
+            unfinished_backtick = False
             for index, response_page in enumerate(response_pages):
                 part_of_thinking = (
-                    thinking_part and index and max_length * index < len(thinking_part)
+                        thinking_part and index and max_length * index < len(thinking_part)
                 )
+                if unfinished_codeblock:
+                    response_page = "```" + unfinished_codeblock + '\n' + response_page
+                    unfinished_codeblock = ""
+                elif unfinished_backtick:
+                    response_page = '`' + response_page
+                    unfinished_backtick = False
+                if response_page.count("```") & 1:
+                    unfinished_codeblock = "c"
+                    response_page += "```"
+                elif response_page.count("`") - 3 * response_page.count("```") & 1:
+                    unfinished_backtick = True
+                    response_page += "`"
                 embed_pages.append(
                     utils.default_embed(
                         ctx, f"Magistral Response {index + 1}/{len(response_pages)}",
@@ -1049,11 +1219,28 @@ class Ollama(config.RevnobotCog):
                 embed=utils.default_embed(ctx, "Mistral Response", f"{response.message.content}")
             )
         else:
+            language_buffer_size = 16
+            max_length = 4096
+            max_length -= language_buffer_size + 8
             embed_pages = []
             response_pages = [
-                response.message.content[x:x + 4096] for x in range(0, len(response.message.content), 4096)
+                response.message.content[x:x + max_length] for x in range(0, len(response.message.content), max_length)
             ]
+            unfinished_codeblock = ""
+            unfinished_backtick = False
             for index, response_page in enumerate(response_pages):
+                if unfinished_codeblock:
+                    response_page = "```" + unfinished_codeblock + '\n' + response_page
+                    unfinished_codeblock = ""
+                elif unfinished_backtick:
+                    response_page = '`' + response_page
+                    unfinished_backtick = False
+                if response_page.count("```") & 1:
+                    unfinished_codeblock = "c"
+                    response_page += "```"
+                elif response_page.count("`") - 3 * response_page.count("```") & 1:
+                    unfinished_backtick = True
+                    response_page += "`"
                 embed_pages.append(
                     utils.default_embed(
                         ctx, f"Mistral Response {index + 1}/{len(response_pages)}", f"{response_page}"
@@ -1124,11 +1311,28 @@ class Ollama(config.RevnobotCog):
                 embed=utils.default_embed(ctx, "Mistral NeMo Response", f"{response.message.content}")
             )
         else:
+            language_buffer_size = 16
+            max_length = 4096
+            max_length -= language_buffer_size + 8
             embed_pages = []
             response_pages = [
-                response.message.content[x:x + 4096] for x in range(0, len(response.message.content), 4096)
+                response.message.content[x:x + max_length] for x in range(0, len(response.message.content), max_length)
             ]
+            unfinished_codeblock = ""
+            unfinished_backtick = False
             for index, response_page in enumerate(response_pages):
+                if unfinished_codeblock:
+                    response_page = "```" + unfinished_codeblock + '\n' + response_page
+                    unfinished_codeblock = ""
+                elif unfinished_backtick:
+                    response_page = '`' + response_page
+                    unfinished_backtick = False
+                if response_page.count("```") & 1:
+                    unfinished_codeblock = "c"
+                    response_page += "```"
+                elif response_page.count("`") - 3 * response_page.count("```") & 1:
+                    unfinished_backtick = True
+                    response_page += "`"
                 embed_pages.append(
                     utils.default_embed(
                         ctx, f"Mistral NeMo Response {index + 1}/{len(response_pages)}", f"{response_page}"
@@ -1219,15 +1423,31 @@ class Ollama(config.RevnobotCog):
                 embed=utils.default_embed(ctx, "GPT-OSS Response", f"{response_content}")
             )
         else:
+            language_buffer_size = 16
             max_length = 4093 if thinking_part else 4096
+            max_length -= language_buffer_size + 8
             embed_pages = []
             response_pages = [
                 response_content[x:x + max_length] for x in range(0, len(response_content), max_length)
             ]
+            unfinished_codeblock = ""
+            unfinished_backtick = False
             for index, response_page in enumerate(response_pages):
                 part_of_thinking = (
                         thinking_part and index and max_length * index < len(thinking_part)
                 )
+                if unfinished_codeblock:
+                    response_page = "```" + unfinished_codeblock + '\n' + response_page
+                    unfinished_codeblock = ""
+                elif unfinished_backtick:
+                    response_page = '`' + response_page
+                    unfinished_backtick = False
+                if response_page.count("```") & 1:
+                    unfinished_codeblock = "c"
+                    response_page += "```"
+                elif response_page.count("`") - 3 * response_page.count("```") & 1:
+                    unfinished_backtick = True
+                    response_page += "`"
                 embed_pages.append(
                     utils.default_embed(
                         ctx, f"GPT-OSS Response {index + 1}/{len(response_pages)}",
