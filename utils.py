@@ -937,7 +937,10 @@ def format_typename(typename: str) -> str:
     if typename not in config.dont_replace:
         whitespace_typename = typename.replace("-", " ").replace("_", " ")
     formatted_typename = ""
-    for word in whitespace_typename.strip().title().split():
+    for word in (
+            whitespace_typename.strip().title() if whitespace_typename not in config.dont_replace
+            else whitespace_typename.strip()
+    ).split():
         if word.lower() in config.uppercase_phrases:
             word = word.upper()
         formatted_typename += f" {word}"
