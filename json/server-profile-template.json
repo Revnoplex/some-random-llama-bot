@@ -78,6 +78,7 @@
     "qwen3-14b": "qwen3-14b",
     "magistral": "magistral:24b",
     "mistral": "mistral:7b",
-    "mistral-nemo": "mistral-nemo:12b"
+    "mistral-nemo": "mistral-nemo:12b",
+    "gpt-oss": "gpt-oss:20b"
   }
 }

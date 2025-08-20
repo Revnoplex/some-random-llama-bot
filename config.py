@@ -161,7 +161,7 @@ dt_string = "%A, %B %d %Y, %H:%M:%S UTC"
 timezone = datetime.timezone(datetime.timedelta(hours=10))
 
 uppercase_phrases = ["pfp", "pp", "tnt", "id"]
-dont_replace = ["g-send-embed", "g-send", "un-mute"]
+dont_replace = ["g-send-embed", "g-send", "un-mute", "ask-gpt-oss"]
 
 max_log_size = 512*1024
 max_log_backups = 16
