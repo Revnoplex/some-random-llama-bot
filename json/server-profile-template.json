@@ -7,7 +7,7 @@
     },
     "ask-llama-vision": {
       "enabled": true,
-      "options": {"11B": "llama3.2-vision:11b", "90B": "llama3.2-vision:90b"},
+      "options": {"11B": "llama3.2-vision-11b", "90B": "llama3.2-vision-90b"},
       "default": "11B"
     },
     "llama-text": {
