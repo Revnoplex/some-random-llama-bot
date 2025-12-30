@@ -155,3 +155,6 @@ tokens.txt
 
 # exclude test service file
 some-random-llama-bot-testing.service
+
+# run configuration
+.run

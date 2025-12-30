@@ -201,18 +201,18 @@ class Errors(config.RevnobotCog):
                 f'({jump_url}) , Traceback: ({oneline_tb}){http_field}')
             owner_name = f"{app.owner.name}#{app.owner.discriminator}" if int(app.owner.discriminator) \
                 else app.owner.name
-            msg_embed = utils.default_embed(ctx, f'Something went wrong!',
-                                            f'Sorry, but {ctx.bot.user.mention} has encountered an unexpected error.\n'
-                                            f'A report has been sent to the developer **@{owner_name}**. Please '
-                                            f'[report this error]'
-                                            f'(https://github.com/Revnoplex/some-random-llama-bot/issues/new'
-                                            f'?assignees=&labels=bug+tagged+with+error+id'
-                                            f'&template=unexpected-error-report.md&title=User+Reported+Bug) on '
-                                            f'[the github repository](https://github.com/Revnoplex/some-random-llama-bot),'
-                                            f' and make sure to specify the following error ID: `{error_id}` and '
-                                            f'specify any extra information regarding the error.',
-                                            discord.Colour.red(),
-                                            "Unexpected Error")
+            msg_embed = utils.default_embed(
+                ctx, f'Something went wrong!',
+                f'Sorry, but {ctx.bot.user.mention} has encountered an unexpected error.\n'
+                f'A report has been sent to the developer **@{owner_name}**. Please '
+                f'[report this error]('
+                f'https://github.com/Revnoplex/some-random-llama-bot/issues/new'
+                f'?assignees=&labels=bug+tagged+with+error+id'
+                f') on [the github repository](https://github.com/Revnoplex/some-random-llama-bot), and make sure to '
+                f'specify the following error ID: `{error_id}` and specify any extra information regarding the error.',
+                discord.Colour.red(),
+                "Unexpected Error"
+            )
             if isinstance(ctx, discord.ApplicationContext):
                 if not ctx.interaction.response.is_done() or resp_message is None:
                     try:
@@ -674,12 +674,12 @@ class Errors(config.RevnobotCog):
         if isinstance(exception, discord.HTTPException) and exception.status == 405:
             pass
         else:
-            embed = utils.default_embed(self.client, f'Unexpected Error Report',
-                                                     f'An Unexpected Error Occurred With the bot. '
-                                                     f'Data associated with the event has been logged. details are '
-                                                     f'below:'
-                                                     f'\n```python\n{tb_string}```', colour=discord.Colour.red(),
-                                                     typename="Unexpected Error")
+            embed = utils.default_embed(
+                self.client, f'Unexpected Error Report',
+                f'An Unexpected Error Occurred With the bot. Data associated with the event has been logged. '
+                f'Details are below:\n```python\n{tb_string}```',
+                colour=discord.Colour.red(), typename="Unexpected Error"
+            )
             embed.add_field(name=":file_folder: Exception Class", value=f'`{type(exception).__name__}`')
             embed.add_field(name=":x: Error Raised", value=f'`{exception}`')
             embed.add_field(name=":clipboard: Event", value=f'`{event_name}`')

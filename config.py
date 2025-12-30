@@ -23,7 +23,7 @@ for key in sysinfo_check.keys():
               "Attempting to fix the issue by copying the field from the template...")
         sysinfo[key] = sysinfo_check[key]
         with open('./json/config.json', "w") as w_sysinfo:
-            json.dump(sysinfo, w_sysinfo, ensure_ascii=False, indent=2)
+            json.dump(sysinfo, w_sysinfo, indent=2)
 with open('./json/version-info.json') as version_info_handle:
     raw_version_info: dict = json.load(version_info_handle)
 with open('./json/emoji-database.json') as emoji_db_handle:
@@ -166,6 +166,4 @@ dont_replace = ["g-send-embed", "g-send", "un-mute", "ask-gpt-oss"]
 max_log_size = 512*1024
 max_log_backups = 16
 
-slash_guilds: Optional[list] = sysinfo["slash guilds"]
-if slash_guilds is None or len(slash_guilds) < 1:
-    slash_guilds = None
+slash_guilds: Optional[list] = sysinfo.get("slash guilds") or None

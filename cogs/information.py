@@ -1,11 +1,13 @@
 import datetime
 import platform
 from collections.abc import Mapping
+
 import discord
 from discord.ext import commands, bridge, pages
 from discord.commands import Option
 from typing import Union, Iterable, Callable, Optional
 import sys
+
 import config
 import utils
 from utils import discord_ts
@@ -26,7 +28,8 @@ class BackBtn(discord.ui.Button):
             await interaction.edit(view=self.view.custom_view)
         try:
             await self.back_to(*self.args, **self.kwargs)
-            self.view.stop()
+            # todo: find out what this did and why it fails
+            # self.view.stop()
         except RuntimeError:
             self.view.remove_item(self)
             await interaction.edit(view=self.view)
@@ -217,38 +220,39 @@ class HelpMenus:
         message_command_count = 0
         user_installable_count = 0
         total_command_count = self.all_commands.__len__()
+
         owner_commands = []
-        for cmd in self.context.bot.get_cog("Owner").get_commands():
+        for cmd in self.context.bot.get_cog("Owner").walk_commands():
             if cmd.qualified_name not in owner_commands:
                 owner_commands.append(cmd.qualified_name)
+
         for cmd in self.all_commands:
-            if cmd.qualified_name not in owner_commands:
-                if isinstance(cmd, commands.Command):
-                    prefix_command_count += 1
-                elif isinstance(cmd, discord.SlashCommand) or isinstance(cmd, discord.SlashCommandGroup):
-                    slash_command_count += 1
-                elif isinstance(cmd, bridge.BridgeExtCommand):
-                    prefix_command_count += 1
-                    slash_command_count += 1
-                elif isinstance(cmd, discord.UserCommand):
-                    user_command_count += 1
-                elif isinstance(cmd, discord.MessageCommand):
-                    message_command_count += 1
-                if hasattr(cmd, "integration_types"):
-                    user_installable_count += discord.IntegrationType.user_install in cmd.integration_types
-            else:
+            if cmd.qualified_name in owner_commands:
                 total_command_count -= 1
+                continue
+            if isinstance(cmd, commands.Command):
+                prefix_command_count += 1
+            elif isinstance(cmd, discord.SlashCommand) or isinstance(cmd, discord.SlashCommandGroup):
+                slash_command_count += 1
+            elif isinstance(cmd, bridge.BridgeExtCommand):
+                prefix_command_count += 1
+                slash_command_count += 1
+            elif isinstance(cmd, discord.UserCommand):
+                user_command_count += 1
+            elif isinstance(cmd, discord.MessageCommand):
+                message_command_count += 1
+            if hasattr(cmd, "integration_types"):
+                user_installable_count += discord.IntegrationType.user_install in cmd.integration_types
 
         duplicate_commands = slash_command_count + user_command_count + message_command_count
-        main_help = utils.default_embed(self.context, f'Help Menu v{self.version}',
-                                        f'**{total_command_count}** Total commands '
-                                        f'(**{duplicate_commands}** duplicates): **{prefix_command_count}** prefix '
-                                        f'commands, **{slash_command_count}** slash commands, '
-                                        f'**{user_command_count}** user commands '
-                                        f'and **{message_command_count}** message command/s (**{user_installable_count}'
-                                        f'** user installable)\n\nType `{self.prefix}help [Category/Command name]` '
-                                        f'to bring up information on the command or the commands for that category\n\n'
-                                        f'**Categories:**\n\n** **')
+        main_help = utils.default_embed(
+            self.context, f'Help Menu v{self.version}',
+            f'**{total_command_count}** Total commands (**{duplicate_commands}** duplicates): '
+            f'**{prefix_command_count}** prefix commands, **{slash_command_count}** slash commands, '
+            f'**{user_command_count}** user commands and **{message_command_count}** message command/s '
+            f'(**{user_installable_count}** user installable)\n\nType `{self.prefix}help [Category/Command name]` to '
+            f'bring up information on the command or the commands for that category\n\n**Categories:**\n\n** **'
+        )
         slash_commands = []
         cogs = []
         # Warning, update this to handle pagination if the bot has more than 25 cogs.
@@ -296,7 +300,7 @@ class HelpMenus:
     async def no_cog_menu(self,
                           command_list: list[Union[discord.ApplicationCommand, commands.Command, bridge.BridgeCommand]],
                           view: utils.DefaultView = None):
-        cog_help = utils.default_embed(self.context, f':question: NC', f'Miscellaneous commands with no category',)
+        cog_help = utils.default_embed(self.context, f':question: NC', f'Miscellaneous commands with no category')
         if len(command_list) > 0:
             def cog_menu(page_commands, sub_cog_help, all_slash):
                 for command in page_commands:
@@ -353,7 +357,7 @@ class HelpMenus:
                 if view is None or view.original_message is None:
                     message = await self.context.respond(
                         embed=utils.default_embed(
-                            self.context, f':Question: NC', f'Miscellaneous commands with no category\nLoading...',
+                            self.context, f':Question: NC', f'Miscellaneous commands with no category\nLoading...'
                         )
                     )
                     if isinstance(message, discord.Interaction):
@@ -362,13 +366,19 @@ class HelpMenus:
                     message = view.original_message
 
                 for index, s_command in enumerate(s_commands):
-                    cog_help = utils.default_embed(self.context, f':Question: NC',
-                                                   f'Miscellaneous commands with no category')
+                    cog_help = utils.default_embed(
+                        self.context, f':Question: NC', f'Miscellaneous commands with no category'
+                    )
                     cog_help = cog_menu(s_command, cog_help, slash_commands)
                     view_instance = utils.DefaultView(message=message, context=self.context, timeout=None)
-                    view_instance.add_item(BackBtn(self.main_help_menu, utils.repack(utils.map_bot(self.context),
-                                                                                     view_instance),
-                                           label="Main Menu", custom_id="mainMenuBackBtn"))
+                    view_instance.add_item(
+                        BackBtn(
+                            self.main_help_menu,
+                            utils.repack(utils.map_bot(self.context),view_instance),
+                            label="Main Menu",
+                            custom_id="mainMenuBackBtn"
+                        )
+                    )
                     view_instance.add_item(CommandSelect(s_command, self))
                     new_pages.append(pages.Page(custom_view=view_instance, embeds=[cog_help]))
                 new_view = new_pages[0].custom_view
@@ -450,16 +460,20 @@ class HelpMenus:
                 new_pages = []
                 if view is None or view.original_message is None:
                     message = await self.context.respond(
-                        embed=utils.default_embed(self.context, f'{cog.icon} {cog.qualified_name}',
-                                                  f'{cog.description}\nLoading...'))
+                        embed=utils.default_embed(
+                            self.context, f'{cog.icon} {cog.qualified_name}', f'{cog.description}\nLoading...'
+                        )
+                    )
                     if isinstance(message, discord.Interaction):
                         message = await self.context.interaction.original_response()
                 else:
                     message = view.original_message
 
                 for index, s_command in enumerate(s_commands):
-                    cog_help = utils.default_embed(self.context, f'{cog.icon} {cog.qualified_name}',
-                                                   f'{cog.description}\n**Commands {index + 1}/{len(s_commands)}:**')
+                    cog_help = utils.default_embed(
+                        self.context, f'{cog.icon} {cog.qualified_name}',
+                        f'{cog.description}\n**Commands {index + 1}/{len(s_commands)}:**'
+                    )
                     cog_help = cog_menu(s_command, cog_help, slash_commands)
                     view_instance = utils.DefaultView(message=message, context=self.context, timeout=None)
                     view_instance.add_item(BackBtn(self.main_help_menu, utils.repack(utils.map_bot(self.context),
@@ -862,8 +876,10 @@ class Information(config.RevnobotCog):
         """About the bot?"""
         app = await self.client.application_info()
 
-        embed = utils.default_embed(ctx, f'{self.client.user.display_name}',
-                                    f'Some random bot that interacts with ollama LLMs')
+        embed = utils.default_embed(
+            ctx, f'{self.client.user.display_name}',
+            f'Some random bot that interacts with ollama LLMs'
+        )
         embed.set_thumbnail(url=self.client.user.display_avatar.url)
         embed.add_field(name=':tools: Version', value=f'{config.version_string}')
         embed.add_field(name=":1234: Discord ID", value=f'{str(self.client.user.id)}')

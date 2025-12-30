@@ -67,7 +67,7 @@ if __name__ == "__main__":
     for filename in cogs_folder:
         if filename.endswith('.py'):
             # disable the debug cog if the bot is not executed with the "debug mode" parameter set to true in the
-            # config json file
+            # config JSON file
             if filename == "debug.py" and not config.debug_mode:
                 continue
             # 2 methods are used to handle cog errors because the pycord devs keep changing how they work

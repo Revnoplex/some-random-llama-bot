@@ -623,8 +623,10 @@ class Owner(config.RevnobotCog):
             embed_pages = []
             data_pages = [self.client.guilds[x:x + 25] for x in range(0, len(self.client.guilds), 25)]
             for index, data_page in enumerate(data_pages):
-                embed = utils.default_embed(ctx, f'Connected to {len(self.client.guilds)} Guilds',
-                                            f'{index + 1}/{len(data_pages)}')
+                embed = utils.default_embed(
+                    ctx, f'Connected to {len(self.client.guilds)} Guilds',
+                    f'{index + 1}/{len(data_pages)}'
+                )
                 for x in data_page:
                     embed.add_field(name=f'<:DiscordLogo:882561395982495754> {x.name}', value=f'{x.id}')
                 embed_pages.append(embed)
@@ -699,7 +701,10 @@ class Owner(config.RevnobotCog):
         """change bot status completely"""
         await self.client.change_presence(activity=discord.Game(status))
         await ctx.respond(
-            embed=utils.default_embed(ctx, "Updated Status", f'Successfully changed the bot status to **{status}**')
+            embed=utils.default_embed(
+                ctx, "Updated Status",
+                f'Successfully changed the bot status to **{status}**'
+            )
         )
 
     # noinspection PyTypeHints
@@ -714,7 +719,7 @@ class Owner(config.RevnobotCog):
         await self.client.change_presence(activity=discord.Game(full_status_str))
         await ctx.respond(
             embed=utils.default_embed(
-                ctx, "Updated Status",f'Successfully changed the bot status to **{full_status_str}**',
+                ctx, "Updated Status", f'Successfully changed the bot status to **{full_status_str}**'
             )
         )
 
@@ -724,9 +729,11 @@ class Owner(config.RevnobotCog):
     async def update_status_reset_cmd(self, ctx: bridge.Context):
         default_status = config.default_status.format(guild_count=len(self.client.guilds))
         await self.client.change_presence(activity=discord.Game(default_status))
-        await ctx.respond(embed=utils.default_embed(ctx, "Updated Status",
-                                                             f'Successfully changed the bot status to '
-                                                             f'**{default_status}**', ))
+        await ctx.respond(
+            embed=utils.default_embed(
+                ctx, "Updated Status", f'Successfully changed the bot status to **{default_status}**'
+            )
+        )
 
     @bridge.bridge_command(name="shutdown", description="Shuts down the bot")
     @commands.bot_has_permissions(send_messages=True)
@@ -775,12 +782,18 @@ class Owner(config.RevnobotCog):
                 raise commands.BadArgument(f'Guild "{guild_arg}" not found.')
         to_leave = to_leave or ctx.guild
         if to_leave is None:
-            await ctx.respond(embed=utils.default_embed(ctx, "Guild Not Found",
-                                                                 f"The Guild {guild_arg} doesn't exist or "
-                                                                 f"I'm not in it.", ))
+            await ctx.respond(
+                embed=utils.default_embed(
+                    ctx, "Guild Not Found",
+                    f"The Guild {guild_arg} doesn't exist or I'm not in it."
+                )
+            )
         else:
-            await ctx.respond(embed=utils.default_embed(ctx, "Leaving Guild....",
-                                                                 f'Leaving **{to_leave.name}** `{to_leave.id}`', ))
+            await ctx.respond(
+                embed=utils.default_embed(
+                    ctx, "Leaving Guild....", f'Leaving **{to_leave.name}** `{to_leave.id}`'
+                )
+            )
             await to_leave.leave()
 
     # noinspection SpellCheckingInspection
@@ -816,7 +829,7 @@ class Owner(config.RevnobotCog):
                                                    [commands.ChannelNotFound(channel_id),
                                                     commands.UserNotFound(channel_id)])
         message = await ctx.respond(embed=utils.default_embed(
-            ctx.bot, "Preparing to send message", f"Preparing to send message to `{channel_id}`", ),
+            ctx, "Preparing to send message", f"Preparing to send message to `{channel_id}`", ),
         )
         if isinstance(message, discord.Interaction):
             message = await message.original_response()
@@ -839,23 +852,22 @@ class Owner(config.RevnobotCog):
                 ctx.message.attachments[0] if ctx.message and len(ctx.message.attachments) > 0
                 else attachment
             )
-            if message_attachment.size > 10*1024**2:
+            if message_attachment.size > 10 * 1024 ** 2:
                 await message.edit(embed=utils.default_embed(
-                    ctx.bot, "Attachment Too Large",
+                    ctx, "Attachment Too Large",
                     f"The attachment provided of size **{utils.byte_units(message_attachment.size, iec=True)}** is"
-                    f" too big and must be less than or equal to **25 MiB**",
-                    ctx
+                    f" too big and must be less than or equal to **10 MiB**",
                 ))
                 return
             attachment_file = await message_attachment.to_file()
         await message.edit(embed=utils.default_embed(
-            ctx.bot, "Sending Message", f"Sending message to {channel.mention}", ),
+            ctx, "Sending Message", f"Sending message to {channel.mention}", ),
         )
         try:
             await channel.send(content, reference=ref_message, mention_author=mention_author, file=attachment_file)
         except discord.HTTPException as http_error:
             await message.edit(embed=utils.default_embed(
-                ctx.bot, "Couldn't Send message", f"`{http_error.text}`", )
+                ctx, "Couldn't Send message", f"`{http_error.text}`")
             )
         else:
             if isinstance(channel, discord.User):
@@ -900,7 +912,7 @@ class Owner(config.RevnobotCog):
                                                    [commands.ChannelNotFound(channel_id),
                                                     commands.UserNotFound(channel_id)])
         message = await ctx.respond(embed=utils.default_embed(
-            ctx.bot, "Preparing to send message", f"Preparing to send message to `{channel_id}`", ),
+            ctx, "Preparing to send message", f"Preparing to send message to `{channel_id}`", ),
         )
         if isinstance(message, discord.Interaction):
             message = await message.original_response()
@@ -925,23 +937,22 @@ class Owner(config.RevnobotCog):
                 ctx.message.attachments[0] if ctx.message and len(ctx.message.attachments) > 0
                 else attachment
             )
-            if message_attachment.size > 25 * 1024 ** 2:
+            if message_attachment.size > 10 * 1024 ** 2:
                 await message.edit(embed=utils.default_embed(
-                    ctx.bot, "Attachment Too Large",
+                    ctx, "Attachment Too Large",
                     f"The attachment provided of size **{utils.byte_units(message_attachment.size, iec=True)}** is"
-                    f" too big and must be less than or equal to **25 MiB**",
-                    ctx
+                    f" too big and must be less than or equal to **10 MiB**",
                 ))
                 return
             embed.set_image(url=message_attachment.url)
         await message.edit(embed=utils.default_embed(
-            ctx.bot, "Sending Message", f"Sending message to {channel.mention}", ),
+            ctx, "Sending Message", f"Sending message to {channel.mention}", ),
         )
         try:
             await channel.send(embed=embed, reference=ref_message, mention_author=mention_author)
         except discord.HTTPException as http_error:
             await message.edit(embed=utils.default_embed(
-                ctx.bot, "Couldn't Send message", f"`{http_error.text}`", )
+                ctx, "Couldn't Send message", f"`{http_error.text}`", )
             )
         else:
             if isinstance(channel, discord.User):
@@ -980,8 +991,9 @@ class Owner(config.RevnobotCog):
         try:
             await channel.trigger_typing()
         except discord.HTTPException as http_error:
-            await ctx.respond(embed=utils.default_embed(ctx, "Couldn't Trigger Typing",
-                                                                 f"`{http_error.text}`", ))
+            await ctx.respond(
+                embed=utils.default_embed(ctx, "Couldn't Trigger Typing", f"`{http_error.text}`")
+            )
         else:
             if isinstance(channel, discord.User):
                 user_name = f"{channel.name}#{channel.discriminator}" if int(channel.discriminator) \
@@ -1021,9 +1033,12 @@ class Owner(config.RevnobotCog):
         if isinstance(cog_error, Exception):
             await ctx.respond(embed=utils.default_embed(ctx, "Could Not Load Module", f'{cog_error}', ))
         else:
-            await ctx.respond(embed=utils.default_embed(ctx, "Loaded Module",
-                                                                 f'Successfully loaded the module '
-                                                                 f'{extension.capitalize()}', ))
+            await ctx.respond(
+                embed=utils.default_embed(
+                    ctx, "Loaded Module",
+                    f'Successfully loaded the module {extension.capitalize()}'
+                )
+            )
 
     # noinspection PyTypeHints
     @extension_group.command(name="reload", usage='{name} [extension name]', description="reload a module")
@@ -1037,9 +1052,11 @@ class Owner(config.RevnobotCog):
         except discord.ExtensionError as e:
             await ctx.respond(embed=utils.default_embed(ctx, "Could Not Reload Module", f'{e}', ))
         else:
-            await ctx.respond(embed=utils.default_embed(ctx, "Reloaded Module",
-                                                                 f'Successfully reloaded the module '
-                                                                 f'{extension}', ))
+            await ctx.respond(
+                embed=utils.default_embed(
+                    ctx, "Reloaded Module",
+                    f'Successfully reloaded the module {extension}'
+                ))
 
     # noinspection PyTypeHints
     @extension_group.command(name="unload", usage='{name} [extension name]', description="unload a module")
@@ -1051,17 +1068,22 @@ class Owner(config.RevnobotCog):
         if extension == "owner":
             await ctx.respond(
                 embed=utils.default_embed(
-                    ctx.bot, "Can't Unload Owner Module",
-                    f"This module can't be unloaded as it would brick the ability to load cogs again", ))
+                    ctx, "Can't Unload Owner Module",
+                    f"This module can't be unloaded as it would brick the ability to load cogs again"
+                )
+            )
             return
         try:
             self.client.unload_extension(f'cogs.{extension}')
         except discord.ExtensionError as e:
             await ctx.respond(embed=utils.default_embed(ctx, "Could Not Unload Module", f'{e}', ))
         else:
-            await ctx.respond(embed=utils.default_embed(ctx, "Unloaded Module",
-                                                                 f'Successfully unloaded the module '
-                                                                 f'{extension.capitalize()}', ))
+            await ctx.respond(
+                embed=utils.default_embed(
+                    ctx, "Unloaded Module",
+                    f'Successfully unloaded the module {extension.capitalize()}'
+                )
+            )
 
     # noinspection PyTypeHints
     @bridge.bridge_command(
@@ -1078,10 +1100,10 @@ class Owner(config.RevnobotCog):
             log = filename
         else:
             log = f'{filename}.log'
-        message = await ctx.respond(embed=utils.default_embed(ctx, f'Uploading `{log}`....',
-                                                                       'Please wait. The bot will not be able to send '
-                                                                       'any other messages in this channel during this '
-                                                                       'process', ))
+        message = await ctx.respond(embed=utils.default_embed(
+            ctx, f'Uploading `{log}`....',
+            'Please wait. The bot will not be able to send any other messages in this channel during this process'
+        ))
         if isinstance(message, discord.Interaction):
             message = await message.original_response()
         path_to_fetch = pathlib.Path(f'./logs/{log}')
@@ -1108,7 +1130,7 @@ class Owner(config.RevnobotCog):
             if err.code == 40005:
                 await message.edit(embed=utils.default_embed(ctx, f'Upload Failed',
                                                              f'The log `{log}` is too big to be uploaded due to '
-                                                             f'discord\'s 10MiB upload limit', ))
+                                                             f'discord\'s 10 MiB upload limit', ))
             else:
                 raise
 
@@ -1136,8 +1158,9 @@ class Owner(config.RevnobotCog):
         try:
             generated_invite = await inv_channel.create_invite(reason=reason, max_age=age, max_uses=uses)
         except discord.HTTPException as invite_error:
-            await ctx.respond(embed=utils.default_embed(ctx, "Could Not Create Invite",
-                                                                 f'{invite_error.text}', ))
+            await ctx.respond(
+                embed=utils.default_embed(ctx, "Could Not Create Invite", f'{invite_error.text}')
+            )
         else:
             embed = utils.default_embed(ctx, "Successfully Created Invite", "", )
             embed.add_field(name=":1234: Invite ID", value=f'{generated_invite.id}')
@@ -1163,8 +1186,9 @@ class Owner(config.RevnobotCog):
             self, ctx: bridge.Context, *, name: BridgeOption(str, "What the name of the guild will be"),
             icon: BridgeOption(discord.Attachment, "The image that will be the server icon", required=False) = None
     ):
-        message = await ctx.respond(embed=utils.default_embed(ctx, "Creating Guild",
-                                                                       f'Please wait. Creating {name}', ))
+        message = await ctx.respond(
+            embed=utils.default_embed(ctx, "Creating Guild", f'Please wait. Creating {name}')
+        )
         if isinstance(message, discord.Interaction):
             message = await message.original_response()
         attachment = MISSING
@@ -1218,11 +1242,13 @@ class Owner(config.RevnobotCog):
     ):
         async def del_server(guild: discord.Guild):
             if guild.owner.id != guild.me.id:
-                await ctx.respond(embed=utils.default_embed(ctx, "Could Not Delete Server",
-                                                                     f'I do not own **{guild.name}**', ))
+                await ctx.respond(
+                    embed=utils.default_embed(ctx, "Could Not Delete Server", f'I do not own **{guild.name}**')
+                )
             else:
-                message = await ctx.respond(embed=utils.default_embed(ctx, "Deleting Server",
-                                                                               f'Deleting **{guild.name}**....', ))
+                message = await ctx.respond(
+                    embed=utils.default_embed(ctx, "Deleting Server", f'Deleting **{guild.name}**....')
+                )
                 if isinstance(message, discord.Interaction):
                     message = await message.original_response()
                 try:
@@ -1234,14 +1260,18 @@ class Owner(config.RevnobotCog):
                     if guild.id != ctx.guild.id:
                         await message.edit(embed=utils.default_embed(ctx, "Deleted Server",
                                                                      f'Successfully deleted **{guild.name}**', ))
+
         if gid is None:
             await del_server(ctx.guild)
         else:
             c_guild = self.client.get_guild(int(gid))
             if c_guild is None:
-                await ctx.respond(embed=utils.default_embed(ctx, "Could Not Delete Server",
-                                                                     f'The guild `{gid}` does not exist or '
-                                                                     f'i\'m not in it', ))
+                await ctx.respond(
+                    embed=utils.default_embed(
+                        ctx, "Could Not Delete Server",
+                        f"The guild `{gid}` does not exist or i'm not in it"
+                    )
+                )
             else:
                 await del_server(c_guild)
 
@@ -1328,7 +1358,7 @@ class Owner(config.RevnobotCog):
             await ctx.respond(embed=utils.default_embed(ctx, "Could Not Delete Role", f'{why.text}', ))
         else:
             embed = utils.default_embed(ctx, f'Role Deleted', f'The role **@{role.name}** was deleted',
-                                        ctx, role.colour.value)
+                                        role.colour.value)
             embed.add_field(name=":1234: Role ID", value=f'{role.id}')
             embed.add_field(name=":art: Colour", value=f'[{role.colour}]'
                                                        f'(https://testthisdevice.com/color/color.php?c='
@@ -1353,27 +1383,31 @@ class Owner(config.RevnobotCog):
     @commands.bot_has_permissions(manage_roles=True, send_messages=True)
     async def role_tools_give_cmd(
             self, ctx: bridge.Context, role: BridgeOption(discord.Role, "The role to assign"),
-            member: discord.Member = None
+            member: BridgeOption(discord.Member, "The member to give the role to", required=False) = None
     ):
         if member is None:
             selected_member = ctx.author
         else:
             selected_member = member
         if selected_member.get_role(role.id) is not None:
-            await ctx.respond(embed=utils.default_embed(ctx, "Already Has Role",
-                                                                 f'{selected_member.mention} already has the role '
-                                                                 f'{role.mention}', ))
+            await ctx.respond(embed=utils.default_embed(
+                ctx, "Already Has Role",
+                f'{selected_member.mention} already has the role {role.mention}'
+            ))
         else:
             try:
                 await selected_member.add_roles(role)
             except discord.HTTPException as role_error:
-                await ctx.respond(embed=utils.default_embed(ctx, "Could Not Add Role To Member",
-                                                                     f'{role_error.text}', ))
+                await ctx.respond(
+                    embed=utils.default_embed(
+                        ctx, "Could Not Add Role To Member", f'{role_error.text}'
+                    )
+                )
             else:
                 await ctx.respond(
                     embed=utils.default_embed(
-                        ctx.bot, "Added Role To Member",
-                        f'Successfully gave the role {role.mention} to {selected_member.mention}', ctx
+                        ctx, "Added Role To Member",
+                        f'Successfully gave the role {role.mention} to {selected_member.mention}'
                     )
                 )
 
@@ -1387,26 +1421,29 @@ class Owner(config.RevnobotCog):
     @commands.bot_has_permissions(manage_roles=True, send_messages=True)
     async def role_tools_remove_cmd(
             self, ctx: bridge.Context, role: BridgeOption(discord.Role, "The role to remove"),
-            member: discord.Member = None
+            member: BridgeOption(discord.Member, "The member to remove the role from", required=False) = None
     ):
         if member is None:
             selected_member = ctx.author
         else:
             selected_member = member
         if selected_member.get_role(role.id) is None:
-            await ctx.respond(embed=utils.default_embed(ctx, "Doesn't Have Role",
-                                                                 f"{selected_member.mention} doesn't have the role "
-                                                                 f'{role.mention}', ))
+            await ctx.respond(embed=utils.default_embed(
+                ctx, "Doesn't Have Role",
+                f"{selected_member.mention} doesn't have the role {role.mention}"
+            ))
         else:
             try:
                 await selected_member.remove_roles(role)
             except discord.HTTPException as role_error:
-                await ctx.respond(embed=utils.default_embed(ctx, "Could Not Remove Role From Member",
-                                                                     f'{role_error.text}', ))
+                await ctx.respond(embed=utils.default_embed(
+                    ctx, "Could Not Remove Role From Member", f'{role_error.text}'
+                ))
             else:
-                await ctx.respond(embed=utils.default_embed(ctx, "Removed Role From Member",
-                                                                     f'Successfully removed the role {role.mention} '
-                                                                     f'from {selected_member.mention}', ))
+                await ctx.respond(embed=utils.default_embed(
+                    ctx, "Removed Role From Member",
+                    f'Successfully removed the role {role.mention} from {selected_member.mention}'
+                ))
 
     # noinspection PyTypeHints
     @bridge.bridge_command(
@@ -1425,7 +1462,7 @@ class Owner(config.RevnobotCog):
     ):
         message = await ctx.respond(
             embed=utils.default_embed(
-                ctx.bot, f'Downloading `{url.rsplit("/")[-1]}`....', f"Connecting to **{url}**....", ctx
+                ctx, f'Downloading `{url.rsplit("/")[-1]}`....', f"Connecting to **{url}**...."
             )
         )
         if isinstance(message, discord.Interaction):
@@ -1435,60 +1472,51 @@ class Owner(config.RevnobotCog):
                                          timeout=timeout) as session:
             try:
                 async with session.get(url) as file:
-                    await message.edit(embed=utils.default_embed(ctx, f'Downloading `{url.rsplit("/")[-1]}`....',
-                                                                 f'**{url.split("/")[2]}** status: [{file.status}]'
-                                                                 f'(https://developer.mozilla.org/en-US/docs'
-                                                                 f'/Web/HTTP/Status/{file.status})', ))
+                    await message.edit(embed=utils.default_embed(
+                        ctx, f'Downloading `{url.rsplit("/")[-1]}`....',
+                        f'**{url.split("/")[2]}** status: [{file.status}]'
+                        f'(https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/{file.status})'
+                    ))
 
                     if not file.ok:
-                        await message.edit(embed=utils.default_embed(ctx,
-                                                                     f'Download Failed: {file.status}',
-                                                                     f'The server **{url.split("/")[2]}** '
-                                                                     f'Returned a [{file.status}]'
-                                                                     f'(https://developer.mozilla.org/en-US/docs'
-                                                                     f'/Web/HTTP/Status/{file.status}) error', ))
+                        await message.edit(embed=utils.default_embed(
+                            ctx, f'Download Failed: {file.status}',
+                            f'The server **{url.split("/")[2]}** Returned a [{file.status}]'
+                            f'(https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/{file.status}) error'
+                        ))
                     else:
                         file_info = await file.content.read()
                         filename_to_write = f'{url.rsplit("/")[-1]}'
                         if os.path.exists(f'./media/downloads/{url.rsplit("/")[-1]}'):
                             view = FileExistsView(timeout=60, input_filedir=f'./media/downloads/{url.rsplit("/")[-1]}',
                                                   message=message, bot=self.client)
-                            await message.edit(embed=utils.default_embed(ctx, f'A File Called '
-                                                                         f'`{url.rsplit("/")[-1]}` already exists',
-                                                                         f'What do you want to do?\n\nDownload will be '
-                                                                         f'canceled automatically in {view.timeout} '
-                                                                         f'seconds if nothing is selected.\n\n '
-                                                                         f'**{url.split("/")[2]}** status:'
-                                                                         f' [{file.status}]'
-                                                                         f'(https://developer.mozilla.org/'
-                                                                         f'en-US/docs/Web/HTTP/Status/'
-                                                                         f'{file.status})', ctx
-                                                                         ), view=view)
+                            await message.edit(embed=utils.default_embed(
+                                ctx, f'A File Called `{url.rsplit("/")[-1]}` already exists',
+                                f'What do you want to do?\n\nDownload will be canceled automatically in '
+                                f'{view.timeout} seconds if nothing is selected.\n\n **{url.split("/")[2]}** status:'
+                                f' [{file.status}]'
+                                f'(https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/{file.status})'
+                            ), view=view)
                             await view.wait()
                             filename_to_write = view.filename_to_write
                         if filename_to_write is None:
-                            await message.edit(embed=utils.default_embed(ctx, "Download Canceled",
-                                                                         f'Download was canceled because filename '
-                                                                         f'already existed\n\n '
-                                                                         f'**{url.split("/")[2]}** status:'
-                                                                         f' [{file.status}]'
-                                                                         f'(https://developer.mozilla.org/'
-                                                                         f'en-US/docs/Web/HTTP/Status/'
-                                                                         f'{file.status})', ))
+                            await message.edit(embed=utils.default_embed(
+                                ctx, "Download Canceled",
+                                f'Download was canceled because filename already existed\n\n '
+                                f'**{url.split("/")[2]}** status: [{file.status}]'
+                                f'(https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/{file.status})'
+                            ))
                         else:
                             with open(f'./media/downloads/{filename_to_write}', 'wb') as file_write:
                                 file_write.write(file_info)
                                 file_write.close()
-                            await message.edit(embed=utils.default_embed(ctx, "Download Successful",
-                                                                         f'Successfully downloaded file as '
-                                                                         f'**{filename_to_write}** in '
-                                                                         f'`./media/downloads/{filename_to_write}` '
-                                                                         f'from {url}\n\n '
-                                                                         f'**{url.split("/")[2]}** status:'
-                                                                         f' [{file.status}]'
-                                                                         f'(https://developer.mozilla.org/'
-                                                                         f'en-US/docs/Web/HTTP/Status/'
-                                                                         f'{file.status})', ))
+                            await message.edit(embed=utils.default_embed(
+                                ctx, "Download Successful",
+                                f'Successfully downloaded file as **{filename_to_write}** in '
+                                f'`./media/downloads/{filename_to_write}` '
+                                f'from {url}\n\n **{url.split("/")[2]}** status: [{file.status}]'
+                                f'(https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/{file.status})'
+                            ))
             except aiohttp.ClientError as aio_error:
                 if isinstance(aio_error, aiohttp.InvalidURL):
                     await message.edit(embed=utils.default_embed(ctx, "Download Failed: Invalid URL",
@@ -1523,8 +1551,9 @@ class Owner(config.RevnobotCog):
         try:
             directory_path = fp.expanduser()
         except RuntimeError:
-            await ctx.respond(embed=utils.default_embed(ctx, "Could Not Give File",
-                                                                 f'Invalid syntax: `{fp}`', ))
+            await ctx.respond(embed=utils.default_embed(
+                ctx, "Could Not Give File", f'Invalid syntax: `{fp}`'
+            ))
             return
         message = await ctx.respond(embed=utils.default_embed(ctx, f'Getting Attachment....', "", ))
         if isinstance(message, discord.Interaction):
@@ -1561,10 +1590,9 @@ class Owner(config.RevnobotCog):
                 filename_to_write = view.filename_to_write
                 path_to_write = pathlib.Path(f'{directory_path.absolute().__str__()}/{filename_to_write}')
             if filename_to_write is None:
-                await message.edit(embed=utils.default_embed(ctx, f'Operation Canceled',
-                                                             f'Operation was canceled because filename already existed',
-                                                             ctx
-                                                             ))
+                await message.edit(embed=utils.default_embed(
+                    ctx, f'Operation Canceled', f'Operation was canceled because filename already existed'
+                ))
             else:
                 await message.edit(embed=utils.default_embed(ctx, f'Writing File',
                                                              f'Writing `{filename_to_write}` to '
@@ -1599,8 +1627,11 @@ class Owner(config.RevnobotCog):
         try:
             fp = fp.expanduser()
         except RuntimeError:
-            await ctx.respond(embed=utils.default_embed(ctx, "Could Not Grab File",
-                                                                 f'Invalid syntax: `{fp}`', ))
+            await ctx.respond(
+                embed=utils.default_embed(
+                    ctx, "Could Not Grab File", f'Invalid syntax: `{fp}`'
+                )
+            )
             return
         stat_args = {"follow_symlinks": False}
         if not fp.exists():
@@ -1612,11 +1643,11 @@ class Owner(config.RevnobotCog):
             else:
                 error_message = f"The file `{fp.absolute()}` does not exist. Make sure there isn't any typos. "
             await ctx.respond(embed=utils.default_embed(ctx, "Could not Fetch File", error_message, ))
-        elif not fp.stat(**stat_args).st_size <= 10*1024**2:
+        elif not fp.stat(**stat_args).st_size <= 10 * 1024 ** 2:
             await ctx.respond(embed=utils.default_embed(
-                ctx.bot, "File Not Upload-able",
+                ctx, "File Not Upload-able",
                 f'The file `{fp.name}` is too big: `{utils.byte_units(fp.stat(**stat_args).st_size, iec=True)}`. The '
-                f'file must meet discord\'s upload limit: `25 MiB`', ))
+                f'file must meet discord\'s upload limit: `10 MiB`', ))
         else:
             directory = fp.absolute().parent
             if directory == "":
@@ -1664,18 +1695,23 @@ class Owner(config.RevnobotCog):
         try:
             directory_path = pathlib.Path(directory).expanduser()
         except RuntimeError:
-            await ctx.respond(embed=utils.default_embed(ctx, "Could Not List Directory",
-                                                                 f'Invalid syntax: `{directory}`', ))
+            await ctx.respond(
+                embed=utils.default_embed(
+                    ctx, "Could Not List Directory", f'Invalid syntax: `{directory}`'
+                )
+            )
             return
         dir_name = directory_path.absolute().__str__()
         if not directory_path.exists():
-            await ctx.respond(embed=utils.default_embed(ctx, "Could Not List Directory",
-                                                                 f'The Directory `{directory}` could not be found. '
-                                                                 f'Make sure there are no typos in the directory name '
-                                                                 f'and try again', ))
+            await ctx.respond(embed=utils.default_embed(
+                ctx, "Could Not List Directory",
+                f'The Directory `{directory}` could not be found. Make sure there are no typos in the directory '
+                f'name and try again'
+            ))
         elif not directory_path.is_dir():
-            await ctx.respond(embed=utils.default_embed(ctx, "Could Not List Directory",
-                                                                 f'`{directory_path.name}` is not a directory', ))
+            await ctx.respond(embed=utils.default_embed(
+                ctx, "Could Not List Directory", f'`{directory_path.name}` is not a directory'
+            ))
         else:
             directory_list = []
             for file_folder in directory_path.iterdir():
@@ -1689,7 +1725,7 @@ class Owner(config.RevnobotCog):
                     is_link = "Sym "
                 if file_folder.is_file():
                     directory_list.append("{:<10}".format(f'{is_link}File:') + f' {file_folder.name} - '
-                                          f'{utils.byte_units(item_status.st_size, iec=iec)}')
+                                                                               f'{utils.byte_units(item_status.st_size, iec=iec)}')
                 elif file_folder.is_dir():
                     dir_type = 'Dir'
                     if file_folder.is_mount():
@@ -1705,14 +1741,13 @@ class Owner(config.RevnobotCog):
                     directory_list.append("{:<10}".format(f'{is_link}Pipe:') + f' {file_folder.name}')
                 else:
                     directory_list.append("{:<10}".format(f'{is_link}Unknown:') + f' {file_folder.name}')
-            list_to_send = '```'+'\n'.join(directory_list)+'```'
+            list_to_send = '```' + '\n'.join(directory_list) + '```'
             if len(list_to_send) <= 4096:
-                await ctx.respond(embed=utils.default_embed(ctx, f'Contents of `{dir_name}`',
-                                                                     list_to_send, ))
+                await ctx.respond(embed=utils.default_embed(ctx, f'Contents of `{dir_name}`', list_to_send))
             else:
                 dir_str = '\n'.join(directory_list)
                 dir_bytes = dir_str.encode('utf-8')
-                if len(dir_bytes) > 10*1024**2:
+                if len(dir_bytes) > 10 * 1024 ** 2:
                     await ctx.respond(
                         embed=utils.default_embed(ctx, "Could Not List Directory",
                                                   f'The directory `{directory_path.name}` '
@@ -1736,15 +1771,17 @@ class Owner(config.RevnobotCog):
         try:
             path = pathlib.Path(raw_path).expanduser()
         except RuntimeError:
-            await ctx.respond(embed=utils.default_embed(ctx, "Could Not Get Path Info",
-                                                                 f'Invalid syntax: `{raw_path}`', ))
+            await ctx.respond(
+                embed=utils.default_embed(
+                    ctx, "Could Not Get Path Info", f'Invalid syntax: `{raw_path}`'
+                ))
             return
         stat_args = {"follow_symlinks": False}
         if not path.exists():
-            await ctx.respond(embed=utils.default_embed(ctx, 'Could Not Get Path Info',
-                                                                 f'The path `{raw_path}` could not be found. '
-                                                                 f'Make sure there are no typos in the path name '
-                                                                 f'and try again', ))
+            await ctx.respond(embed=utils.default_embed(
+                ctx, 'Could Not Get Path Info',
+                f'The path `{raw_path}` could not be found. Make sure there are no typos in the path name and try again'
+            ))
         else:
             path_info = path.stat(**stat_args)
             if path.is_dir():
@@ -1780,6 +1817,7 @@ class Owner(config.RevnobotCog):
                         str_perms += "n"
                     str_perms += str_perm + "," if index + 1 < len(path_perms) else str_perm
                 return str_perms
+
             str_path_perms = format_path_perms(path_info.st_mode)
             path_bin = format(path_info.st_mode, "016b")
             path_type_hex = hex(int(path_bin[:4], 2))[2:]
@@ -1841,7 +1879,7 @@ class Owner(config.RevnobotCog):
                 embed.add_field(name="Directories", value=calculated_directories)
             if not path.is_dir():
                 embed.add_field(name="Upload-able to Discord",
-                                value=utils.yes_no(path.stat(**stat_args).st_size <= 25*1024**2))
+                                value=utils.yes_no(path.stat(**stat_args).st_size <= 10 * 1024 ** 2))
 
             if not path.is_dir():
                 await ctx.respond(embed=embed)
@@ -1854,12 +1892,12 @@ class Owner(config.RevnobotCog):
                 si_size = utils.byte_units(raw_size)
                 iec_size = utils.byte_units(raw_size, iec=True)
                 embed.description = f'{si_size} (SI Units)'
-                embed.set_field_at(embed_len-5, name="Size in SI Units", value=si_size)
-                embed.set_field_at(embed_len-4, name="Size in IEC Units", value=iec_size)
-                embed.set_field_at(embed_len-3, name="Exact Size", value=f'{"{:,}".format(raw_size)} '
-                                                                         f'{"byte" if raw_size == 1 else "bytes"}')
-                embed.set_field_at(embed_len-2, name="Files", value=f'{"{:,}".format(calculated_files)}')
-                embed.set_field_at(embed_len-1, name="Directories", value=f'{"{:,}".format(calculated_directories)}')
+                embed.set_field_at(embed_len - 5, name="Size in SI Units", value=si_size)
+                embed.set_field_at(embed_len - 4, name="Size in IEC Units", value=iec_size)
+                embed.set_field_at(embed_len - 3, name="Exact Size", value=f'{"{:,}".format(raw_size)} '
+                                                                           f'{"byte" if raw_size == 1 else "bytes"}')
+                embed.set_field_at(embed_len - 2, name="Files", value=f'{"{:,}".format(calculated_files)}')
+                embed.set_field_at(embed_len - 1, name="Directories", value=f'{"{:,}".format(calculated_directories)}')
                 await message.edit(embed=embed)
 
     # noinspection PyTypeHints
@@ -1918,7 +1956,7 @@ class Owner(config.RevnobotCog):
                         "COLUMNS": "169",
                         "TERM": "xterm-256color"
                     },
-                    )
+                )
             )
             execution_embed.add_field(name="PID", value=f'{process.pid}')
             view = SystemExecuteView(process, timeout=60, message=message, bot=self.client)
@@ -1952,7 +1990,7 @@ class Owner(config.RevnobotCog):
                             operation = message.edit
                         else:
                             operation = ctx.respond
-                        execution_embed.title = f"Output of `{command}` {inx+1}/{len(outputs)}"
+                        execution_embed.title = f"Output of `{command}` {inx + 1}/{len(outputs)}"
                         execution_embed.description = "```" + ("ansi\n" + big_line if ansi_colour else
                                                                utils.remove_ansi_colours(big_line)) + "```"
                         await operation(embed=execution_embed)
@@ -1967,6 +2005,7 @@ class Owner(config.RevnobotCog):
                                                            utils.remove_ansi_colours(decoded_output)) + "```"
                     await message.edit(embed=execution_embed)
                     return execution_embed
+
             exec_embed: Optional[discord.Embed] = None
             if replace_new_lines:
                 nice_stdout = open(os.dup(process.stdout.fileno()), newline='')
@@ -1978,7 +2017,7 @@ class Owner(config.RevnobotCog):
             return_code = await self.client.loop.run_in_executor(None, lambda: process.wait())
             str_exit_code = str(return_code)
             if return_code < 0:
-                str_exit_code = f"{return_code} ({128 | return_code*-1})"
+                str_exit_code = f"{return_code} ({128 | return_code * -1})"
             if exec_embed:
                 exec_embed.add_field(name="Exit Code", value=str_exit_code)
                 view.disable_all_items()
@@ -1995,7 +2034,7 @@ class Owner(config.RevnobotCog):
             self, ctx: bridge.Context, *, fp: BridgeOption(str, "The path to the file to read"),
             view_as: BridgeOption(
                 str, "How to view the file as. Defaults to utf-8 and a byte string if encoding fails",
-                choices=supported_encodings, default='utf-8'
+                choices=supported_encodings, default='utf-8', name="view-as"
             ) = 'utf-8'
     ):
         fp = pathlib.Path(fp)
@@ -2005,21 +2044,27 @@ class Owner(config.RevnobotCog):
             await ctx.respond(f"Invalid syntax: `{fp}`")
             return
         if not fp.exists():
-            await ctx.respond(embed=utils.default_embed(ctx, 'Could Not View File',
-                                                                 f'The file `{fp}` could not be found. '
-                                                                 f'Make sure there are no typos in the path name '
-                                                                 f'and try again', ))
+            await ctx.respond(embed=utils.default_embed(
+                ctx, 'Could Not View File',
+                f'The file `{fp}` could not be found. Make sure there are no typos in the path name and try again'
+            ))
         elif not fp.is_file():
-            await ctx.respond(embed=utils.default_embed(ctx, 'Could Not View File',
-                                                                 f'`{fp.name}` is not a readable file', ))
+            await ctx.respond(
+                embed=utils.default_embed(
+                    ctx, 'Could Not View File', f'`{fp.name}` is not a readable file'
+                )
+            )
         else:
             try:
                 with open(fp, 'rb') as file_handle:
                     file_contents = file_handle.read()
                     file_handle.close()
             except PermissionError:
-                await ctx.respond(embed=utils.default_embed(ctx, "Could Not View File",
-                                                                     f'Missing permission to read `{fp.name}`'))
+                await ctx.respond(
+                    embed=utils.default_embed(
+                        ctx, "Could Not View File", f'Missing permission to read `{fp.name}`'
+                    )
+                )
                 return
             text_encoded = False
             failed_encoding = False
@@ -2088,7 +2133,7 @@ class Owner(config.RevnobotCog):
                                             f'The file `{fp.name}` is too large to '
                                             f'be displayed as {view_as} on discord', )
                 embed.add_field(name="Max Size", value="4090 characters")
-                embed.add_field(name="Representation size", value=f"{len(file_contents)-(6+len(lang))} characters")
+                embed.add_field(name="Representation size", value=f"{len(file_contents) - (6 + len(lang))} characters")
                 embed.add_field(name="Representation selected", value=view_as)
                 embed.add_field(name="File Size", value=f"{'{:,}'.format(stat_size)} bytes "
                                                         f"({utils.byte_units(stat_size)}, "
@@ -2101,9 +2146,14 @@ class Owner(config.RevnobotCog):
                     (f'{utils.byte_units(stat_size)} / {"{:,}".format(stat_size)} bytes / ASCII characters'
                      if stat_size >= 1000 else f'{"{:,}".format(stat_size)} bytes / ASCII characters')
                 await ctx.respond(embed=utils.default_embed(
-                    ctx.bot, f'Contents of `{fp.name}`\n{sizes}' +
-                             (f'\n:warning: Could not display the file in the format {view_as}! Defaulting to a byte '
-                              f'string' if failed_encoding else ""), f'{file_contents}', ))
+                    ctx,
+                    f'Contents of `{fp.name}`\n{sizes}' +
+                    (
+                        f'\n:warning: Could not display the file in the format {view_as}! Defaulting to a byte string'
+                        if failed_encoding else ""
+                    ),
+                    f'{file_contents}'
+                ))
 
     # noinspection PyTypeHints
     @bridge.bridge_command(name='con-spam', usage="{prefix}{name} [amount](int) [times](int) [message]")
@@ -2132,7 +2182,7 @@ class Owner(config.RevnobotCog):
     @commands.bot_has_permissions(send_messages=True)
     async def guild_tools_fix_missing(
             self, ctx: bridge.Context,
-            guild_id: BridgeOption(str, "The ID of the guild to check", required=False) = None
+            guild_id: BridgeOption(str, "The ID of the guild to check", required=False, name="guild-id") = None
     ):
         guilds_fixed = 0
         guild = None
@@ -2161,14 +2211,14 @@ class Owner(config.RevnobotCog):
             if guilds_fixed:
                 await ctx.respond(
                     embed=utils.default_embed(
-                        ctx.bot, "Fixed Configuration",
-                        f'Repaired server configuration files for **{guilds_fixed}** servers', ctx
+                        ctx, "Fixed Configuration",
+                        f'Repaired server configuration files for **{guilds_fixed}** servers'
                     )
                 )
             else:
                 await ctx.respond(
                     embed=utils.default_embed(
-                        ctx.bot, "None Missing", f'No server configuration files were missing', ctx
+                        ctx, "None Missing", f'No server configuration files were missing'
                     )
                 )
         else:
@@ -2176,16 +2226,15 @@ class Owner(config.RevnobotCog):
             if fix_func:
                 await ctx.respond(
                     embed=utils.default_embed(
-                        ctx.bot, "Fixed Configuration", f'Repaired server configuration file for **{guild.name}**', ctx
+                        ctx, "Fixed Configuration", f'Repaired server configuration file for **{guild.name}**'
                     )
                 )
             else:
                 await ctx.respond(
                     embed=utils.default_embed(
-                        ctx.bot, "Not Missing",
+                        ctx, "Not Missing",
                         f'The server configuration file for **{guild.name}** already exists. To repair a '
-                        f'broken configuration file, delete the config file for the server and run this command again',
-                        ctx
+                        f'broken configuration file, delete the config file for the server and run this command again'
                     )
                 )
 
@@ -2269,9 +2318,10 @@ class Owner(config.RevnobotCog):
         else:
             split_url = url.split("/")[2]
 
-        message = await ctx.respond(embed=utils.default_embed(ctx, f'Connecting to {split_url}....',
-                                                                       "Connection will timeout after 30 seconds and "
-                                                                       "website will be considered down", ))
+        message = await ctx.respond(embed=utils.default_embed(
+            ctx, f'Connecting to {split_url}....',
+            "Connection will timeout after 30 seconds and website will be considered down"
+        ))
         if hasattr(ctx, 'interaction'):
             message = await ctx.interaction.original_response()
         try:
@@ -2279,66 +2329,70 @@ class Owner(config.RevnobotCog):
                                              timeout=timeout) as session:
                 async with session.get(url) as site:
                     if str(site.status).startswith(("1", "3")):
-                        await message.edit(embed=utils.default_embed(ctx, f'Website Accessible',
-                                                                     f'The website **{url.split("/")[2]}** is '
-                                                                     f'accessible but returned a status of '
-                                                                     f'[{site.status}](https://developer.mozilla.org/'
-                                                                     f'en-US/docs/Web/HTTP/Status/{site.status})',
-                                                                     ))
+                        await message.edit(embed=utils.default_embed(
+                            ctx, f'Website Accessible',
+                            f'The website **{url.split("/")[2]}** is accessible but returned a status of '
+                            f'[{site.status}](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/{site.status})'
+                        ))
                     if str(site.status).startswith("4"):
-                        await message.edit(embed=utils.default_embed(ctx, f'Website Possibly Down',
-                                                                     f'The website **{url.split("/")[2]}** '
-                                                                     f'returned an error [{site.status}]'
-                                                                     f'(https://developer.mozilla.org/en-US/docs/Web/'
-                                                                     f'HTTP/Status/{site.status})', ))
+                        await message.edit(embed=utils.default_embed(
+                            ctx, f'Website Possibly Down',
+                            f'The website **{url.split("/")[2]}** returned an error [{site.status}]'
+                            f'(https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/{site.status})'
+                        ))
                     if str(site.status).startswith("5"):
-                        await message.edit(embed=utils.default_embed(ctx, f'Website is down',
-                                                                     f'The website **{url.split("/")[2]}** is down '
-                                                                     f'with an error code: [{site.status}]'
-                                                                     f'(https://developer.mozilla.org/en-US/docs/Web'
-                                                                     f'/HTTP/Status/{site.status})', ))
+                        await message.edit(embed=utils.default_embed(
+                            ctx, f'Website is down',
+                            f'The website **{url.split("/")[2]}** is down with an error code: [{site.status}]'
+                            f'(https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/{site.status})'
+                        ))
                     if str(site.status).startswith("2"):
                         if site.status == 200:
-                            await message.edit(embed=utils.default_embed(ctx, f'Website is up',
-                                                                         f'The website **{url.split("/")[2]}** is up '
-                                                                         f'and running with a status of '
-                                                                         f'[{site.status}]'
-                                                                         f'(https://developer.mozilla.org/en-US/docs/'
-                                                                         f'Web/HTTP/Status/{site.status})', ))
+                            await message.edit(embed=utils.default_embed(
+                                ctx, f'Website is up',
+                                f'The website **{url.split("/")[2]}** is up and running with a status of '
+                                f'[{site.status}]'
+                                f'(https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/{site.status})'
+                            ))
                         else:
-                            await message.edit(embed=utils.default_embed(ctx, f'Website is up',
-                                                                         f'The website **{url.split("/")[2]}** is up '
-                                                                         f'and gave a status of [{site.status}]'
-                                                                         f'(https://developer.mozilla.org/en-US/docs'
-                                                                         f'/Web/HTTP/Status/{site.status})', ))
+                            await message.edit(embed=utils.default_embed(
+                                ctx, f'Website is up',
+                                f'The website **{url.split("/")[2]}** is up and gave a status of [{site.status}]'
+                                f'(https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/{site.status})'
+                            ))
 
         except (aiohttp.InvalidURL, IndexError, AttributeError):
-            await message.edit(embed=utils.default_embed(ctx, "Invalid Url",
-                                                         "this is not a url", ))
+            await message.edit(
+                embed=utils.default_embed(ctx, "Invalid Url", "this is not a url")
+            )
         except asyncio.exceptions.TimeoutError:
-            await message.edit(embed=utils.default_embed(ctx, "Website Down: Connection timed out",
-                                                         f'**{url.split("/")[2]}**\'s server is not responding',
-                                                         ))
+            await message.edit(embed=utils.default_embed(
+                ctx, "Website Down: Connection timed out",
+                f'**{url.split("/")[2]}**\'s server is not responding',
+            ))
         except aiohttp.TooManyRedirects:
-            await message.edit(embed=utils.default_embed(ctx, "Website Down: Broken Response",
-                                                         f'**{url.split("/")[2]}** caused a redirect loop', ))
+            await message.edit(
+                embed=utils.default_embed(
+                    ctx, "Website Down: Broken Response",
+                    f'**{url.split("/")[2]}** caused a redirect loop'
+                ))
         except aiohttp.ClientConnectorCertificateError:
-            await message.edit(embed=utils.default_embed(ctx, "Website Inaccessible: SSL Verification Failed",
-                                                         f'The ssl certificate for **{url.split("/")[2]}** was '
-                                                         f'rejected. Try running this command again with the '
-                                                         f'`ignore_ssl` parameter set to `Yes`. '
-                                                         f'But this could mean something is wrong with the website',
-                                                         ))
+            await message.edit(embed=utils.default_embed(
+                ctx, "Website Inaccessible: SSL Verification Failed",
+                f'The ssl certificate for **{url.split("/")[2]}** was rejected. Try running this command again with '
+                f'the `ignore_ssl` parameter set to `Yes`. But this could mean something is wrong with the website',
+            ))
         except aiohttp.ClientSSLError:
-            await message.edit(embed=utils.default_embed(ctx, "Website Inaccessible: SSL Verification Failed",
-                                                         f'The ssl verification failed for **{url.split("/")[2]}**.'
-                                                         f'Try running this command again with the `ignore_ssl` '
-                                                         f'parameter set to `Yes`. But this could mean something is '
-                                                         f'wrong with the website', ))
+            await message.edit(embed=utils.default_embed(
+                ctx, "Website Inaccessible: SSL Verification Failed",
+                f'The ssl verification failed for **{url.split("/")[2]}**. Try running this command again with the '
+                f'`ignore_ssl` parameter set to `Yes`. But this could mean something is wrong with the website'
+            ))
         except aiohttp.ClientOSError as error:
-            await message.edit(embed=utils.default_embed(ctx, "Website Inaccessible: ",
-                                                         f'An error occurred while trying to connect to'
-                                                         f' **{url.split("/")[2]}**: ```{error}```', ))
+            await message.edit(embed=utils.default_embed(
+                ctx, "Website Inaccessible: ",
+                f'An error occurred while trying to connect to **{url.split("/")[2]}**: ```{error}```'
+            ))
 
     # noinspection PyTypeHints
     @guild_tools_group.command(
@@ -2346,7 +2400,7 @@ class Owner(config.RevnobotCog):
     )
     @commands.is_owner()
     async def guild_tools_ban_cmd(
-            self, ctx: bridge.Context, guild_str: BridgeOption(str, "The ID of the guild to ban")
+            self, ctx: bridge.Context, guild_str: BridgeOption(str, "The ID of the guild to ban", name="guild-id")
     ):
         if not guild_str.isdecimal():
             raise commands.BadArgument('Converting to "int" failed for parameter "guild_str".')
@@ -2364,7 +2418,7 @@ class Owner(config.RevnobotCog):
                     empty_json.close()
                 await ctx.respond(
                     embed=utils.default_embed(
-                        self.client, "Ban List Corrupted", "Created new list. Run this command again to ban server"
+                        ctx, "Ban List Corrupted", "Created new list. Run this command again to ban server"
                     )
                 )
             else:
@@ -2374,14 +2428,14 @@ class Owner(config.RevnobotCog):
                         empty_json.close()
                     await ctx.respond(
                         embed=utils.default_embed(
-                            self.client, "Ban List Corrupted",
+                            ctx, "Ban List Corrupted",
                             "Created new list. Run this command again to ban server"
                         )
                     )
                 elif guild_id in ban_list:
                     await ctx.respond(
                         embed=utils.default_embed(
-                            self.client, "Already Banned", "Server already in ban list"
+                            ctx, "Already Banned", "Server already in ban list"
                         )
                     )
                 else:
@@ -2399,7 +2453,7 @@ class Owner(config.RevnobotCog):
                     text = f"{guild.name} ({guild_id})" if guild else f"{guild_id}"
                     await ctx.respond(
                         embed=utils.default_embed(
-                            self.client, "Banned Server", f"Successfully banned {text}"
+                            ctx, "Banned Server", f"Successfully banned {text}"
                         )
                     )
 
@@ -2409,7 +2463,7 @@ class Owner(config.RevnobotCog):
     )
     @commands.is_owner()
     async def guild_tools_unban_cmd(
-            self, ctx: bridge.Context, guild_str: BridgeOption(str, "The ID of the guild to unban")
+            self, ctx: bridge.Context, guild_str: BridgeOption(str, "The ID of the guild to unban", name="guild-id")
     ):
         if not guild_str.isdecimal():
             raise commands.BadArgument('Converting to "int" failed for parameter "guild_str".')
@@ -2426,7 +2480,7 @@ class Owner(config.RevnobotCog):
                     json.dump([], empty_json, indent=2)
                     empty_json.close()
                 await ctx.respond(embed=utils.default_embed(
-                    self.client, "Ban List Corrupted", "Created new list. Run this command again to unban server"
+                    ctx, "Ban List Corrupted", "Created new list. Run this command again to unban server"
                 ))
             else:
                 if not isinstance(ban_list, list):
@@ -2434,11 +2488,11 @@ class Owner(config.RevnobotCog):
                         json.dump([], empty_json, indent=2)
                         empty_json.close()
                     await ctx.respond(embed=utils.default_embed(
-                        self.client, "Ban List Corrupted", "Created new list. Run this command again to unban server"
+                        ctx, "Ban List Corrupted", "Created new list. Run this command again to unban server"
                     ))
                 elif guild_id not in ban_list:
                     await ctx.respond(embed=utils.default_embed(
-                        self.client, "Not Banned", "Server is not in ban list"
+                        ctx, "Not Banned", "Server is not in ban list"
                     ))
                 else:
                     ban_list.remove(guild_id)
@@ -2451,7 +2505,7 @@ class Owner(config.RevnobotCog):
                         guild = None
                     text = f"{guild.name} ({guild_id})" if guild else f"{guild_id}"
                     await ctx.respond(embed=utils.default_embed(
-                        self.client, "Unbanned Server", f"Successfully unbanned {text}"
+                        ctx, "Unbanned Server", f"Successfully unbanned {text}"
                     ))
 
     @guild_tools_group.command(name="list", aliases=["ls"], description="List banned server IDs")
@@ -2469,7 +2523,7 @@ class Owner(config.RevnobotCog):
                     json.dump([], empty_json, indent=2)
                     empty_json.close()
                 await ctx.respond(embed=utils.default_embed(
-                    self.client, "Ban List Corrupted", "Created new list. Run this command again to unban server"
+                    ctx, "Ban List Corrupted", "Created new list. Run this command again to unban server"
                 ))
             else:
                 if not isinstance(ban_list, list):
@@ -2477,12 +2531,12 @@ class Owner(config.RevnobotCog):
                         json.dump([], empty_json, indent=2)
                         empty_json.close()
                     await ctx.respond(embed=utils.default_embed(
-                        self.client, "Ban List Corrupted", "Created new list. Run this command again to unban server"
+                        ctx, "Ban List Corrupted", "Created new list. Run this command again to unban server"
                     ))
                 else:
                     str_ban_list = '\n'.join([str(entry) for entry in ban_list])
                     await ctx.respond(embed=utils.default_embed(
-                        self.client, "List of Banned Server IDs", f"{str_ban_list}"
+                        ctx, "List of Banned Server IDs", f"{str_ban_list}"
                     ))
 
     @bridge.bridge_command(
@@ -2493,9 +2547,11 @@ class Owner(config.RevnobotCog):
         try:
             apcaccess_cmd = subprocess.Popen(["apcaccess", "status"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         except FileNotFoundError as missing:
-            await ctx.respond(embed=utils.default_embed(
-                ctx.bot, f"Error", f"`{missing.filename}` command not found", ctx
-            ))
+            await ctx.respond(
+                embed=utils.default_embed(
+                    ctx, f"Error", f"`{missing.filename}` command not found"
+                )
+            )
             return
         apcaccess_failed = await self.client.loop.run_in_executor(None, lambda: apcaccess_cmd.wait())
         try:
@@ -2504,9 +2560,11 @@ class Owner(config.RevnobotCog):
                 lambda: apcaccess_cmd.stdout.read().decode("utf-8")
             )
         except UnicodeDecodeError:
-            await ctx.respond(embed=utils.default_embed(
-                ctx.bot, f"Error", f"`apcaccess status` returned unreadable result", ctx
-            ))
+            await ctx.respond(
+                embed=utils.default_embed(
+                    ctx, f"Error", f"`apcaccess status` returned unreadable result"
+                )
+            )
             return
         if apcaccess_failed:
             try:
@@ -2520,15 +2578,14 @@ class Owner(config.RevnobotCog):
                 error_message = apcaccess_output or "No Output"
             await ctx.respond(
                 embed=utils.default_embed(
-                    ctx.bot,
+                    ctx,
                     f"Error",
                     f"`apcaccess status` returned exit code **{apcaccess_failed}**"
-                    f"\n**Output:**\n```ansi\n{error_message}\n```",
-                    ctx
+                    f"\n**Output:**\n```ansi\n{error_message}\n```"
                 )
             )
         else:
-            status_embed = utils.default_embed(ctx, "UPS Status", "", )
+            status_embed = utils.default_embed(ctx, "UPS Status", "")
             # noinspection SpellCheckingInspection
             name_lookup = {
                 "LINEV": "Mains Voltage",
@@ -2630,9 +2687,8 @@ class Owner(config.RevnobotCog):
                 embed=utils.default_embed(
                     ctx,
                     "Setup",
-                    ("To properly configure Revnobot, you need to download the file above, fill out or change the "
-                     "values and run this command again with the file attached"),
-
+                    "To properly configure Revnobot, you need to download the file above, fill out or change the "
+                    "values and run this command again with the file attached"
                 ),
                 files=[config_to_send])
         else:
@@ -2652,7 +2708,7 @@ class Owner(config.RevnobotCog):
                 except json.JSONDecodeError as decode_error:
                     await ctx.reply(
                         embed=utils.default_embed(
-                            ctx.bot,
+                            ctx,
                             "Format Error",
                             f'this is not a json file or it is corrupted: {decode_error}',
                         )
@@ -2764,7 +2820,7 @@ class Owner(config.RevnobotCog):
                     except KeyError as missing_key:
                         await ctx.reply(
                             embed=utils.default_embed(
-                                ctx.bot,
+                                ctx,
                                 "Invalid Configuration",
                                 f"The key `{missing_key}` is missing from the configuration file"
                             )
@@ -2772,7 +2828,7 @@ class Owner(config.RevnobotCog):
                     except InvalidConfiguration as invalid_configuration:
                         await ctx.reply(
                             embed=utils.default_embed(
-                                ctx.bot,
+                                ctx,
                                 "Invalid Configuration",
                                 f"{invalid_configuration}"
                             )
@@ -2782,7 +2838,7 @@ class Owner(config.RevnobotCog):
                             json.dump(config_json, w_guild_config, ensure_ascii=False, indent=4)
                         await ctx.reply(
                             embed=utils.default_embed(
-                                ctx.bot,
+                                ctx,
                                 "Configuration Saved",
                                 f"The configuration for this server has been updated successfully"
                             )

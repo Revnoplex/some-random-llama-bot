@@ -281,9 +281,11 @@ class Logging(config.RevnobotCog):
                 and psa_data["content"] and ctx.command.name != "write-psa"
         ):
             if psa_data["embed"]:
-                # noinspection SpellCheckingInspection
-                await utils.send_type(ctx)(embed=utils.default_embed(ctx, "Revnobot Public Service Announcement",
-                                                                     psa_data["content"]))
+                await utils.send_type(ctx)(
+                    embed=utils.default_embed(
+                        ctx, f"{ctx.bot.user.display_name} Public Service Announcement", psa_data["content"]
+                    )
+                )
             else:
                 await utils.send_type(ctx)(psa_data["content"])
             psa_data["posted to"].append(ctx.guild.id)

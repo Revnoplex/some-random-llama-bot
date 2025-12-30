@@ -1,5 +1,5 @@
-from discord.ext import bridge
 import config
+from discord.ext import bridge
 
 
 class Processes(config.RevnobotCog):
