@@ -24,8 +24,8 @@ class Ollama(config.RevnobotCog):
     async def cog_check(ctx: Union[discord.ApplicationContext, commands.Context]) -> bool:
         if ctx.command.qualified_name in ['clear-context']:
             return True
-        check = config.current_profile["commands"][ctx.command.qualified_name]["enabled"]
-        if not check:
+        command_entry = config.current_profile["commands"].get(ctx.command.qualified_name)
+        if command_entry is None or (not command_entry["enabled"]):
             raise commands.DisabledCommand('This LLM is disabled in the current configuration')
         return True
 
